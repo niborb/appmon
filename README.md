@@ -5,11 +5,14 @@ How to install?
 ===============
 
 1. Apache - VirtualHost
+=======================
 
 You can add the following VirtualHost to your apache
 virtualhost configuration file (for instance http-vhosts.conf)
 
 http-vhosts.conf:
+
+
     <VirtualHost *:80>
        # change to your email address
        ServerAdmin admin@localhost
@@ -23,6 +26,7 @@ http-vhosts.conf:
     </VirtualHost>
 
 2. Database
+===========
 
 2.1 cp parameters.dist.ini (</path/to/appmon>/app/config/) to parameters.ini
 2.2 open parameters.ini in your text editor, and change, if necessary the
