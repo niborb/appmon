@@ -1,0 +1,22 @@
+{% extends 'RtsAppMonBundle::layout.html.twig' %}
+
+{% form_theme form 'form_table_layout.html.twig' %}
+
+{% block content %}
+
+<form action="{{ path('rts_appmon_default_post', {'id': application.id}) }}" method="post" {{ form_enctype(form) }}>
+<article class="module width_full">
+    <header><h3>Add/Edit App {{application.name}}</h3></header>
+    <div class="module_content">
+            {{ form_widget(form) }}
+    </div>
+    <footer>
+        <div class="submit_link">
+            <input type="submit" class="alt_btn" value="{%trans%}Save{%endtrans%}"/>
+        </div>
+    </footer>
+</article>
+</form>
+<!-- end of stats article -->
+{% endblock%}
+

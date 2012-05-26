@@ -1,0 +1,156 @@
+{% extends 'RtsAppMonBundle::layout.html.twig' %}
+{% block secondary_bar%}
+{{ parent()}}
+<div id="progressbar"></div>
+{% endblock%}
+{% block content %}
+<article class="module width_full" xmlns="http://www.w3.org/1999/html">
+    <header><h3>App list</h3>
+
+        <div class="submit_link">
+            <form>
+                <input class="app-update-all alt_btn" type="submit" value="{%trans%}Refresh all apps{%endtrans%}"/>
+            </form>
+        </div>
+
+
+    </header>
+
+    <table class="tablesorter" cellspacing="0">
+        <thead>
+        <tr>
+            <th width="180">Server</th>
+            <th class="app-description">Name</th>
+            <th>Version</th>
+            <th class="http-status">Status</th>
+            <th colspan="4">&nbsp;</th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+        {% for application in apps %}
+        <tr class="app-row" data-id="{{application.id}}">
+            <td><a class="app-link" data-id="{{application.id}}"
+                   href="{{path('rts_appmon_server_edit', {'id':application.server.id})}}">{{ application.server }}</a>
+            </td>
+            <td><span class="app-name">{{ application.name }}</span>
+                {% if application.metaData|length > 0 %}
+                    <span>
+                        <a onclick="$('#details-{{application.id}}').toggle();" style="cursor:context-menu">
+                            {%trans%}(details){% endtrans%}
+                        </a>
+                    </span>
+
+                <div class="app-details" id="details-{{application.id}}" style="display: none;">
+                    <ul>
+                        {% for key, meta in application.metaData %}
+                        <li>{{key}}: {{meta}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </td>
+            <td class="app-version">{{ application.version}}</td>
+            <td class="app-http-status">
+                <span class="http-status-default http-status-{{application.httpStatus}}">{{ application.httpStatus}}</span>
+            </td>
+            <td>
+                <a onclick="if (!confirm('{% trans%} Are you sure you want to delete this app? {% endtrans %}')) { return false;}"
+                   href="{{path('rts_appmon_default_delete', {'id': application.id}) }}">
+                    <img src="{{ asset('bundles/rtsappmon/images/delete.png')}}"
+                         title="{% trans %}delete{% endtrans %}"/>
+                </a>
+            </td>
+            <td><a href="{{path('rts_appmon_default_update', {'id': application.id}) }}">
+                <img src="{{ asset('bundles/rtsappmon/images/database_refresh.png')}}"
+                     title="{% trans %}update{% endtrans %}"/>
+            </a>
+            </td>
+            <td>
+                <a href="{{path('rts_appmon_default_edit', {'id': application.id}) }}">
+                    <img src="{{ asset('bundles/rtsappmon/images/application_form_edit.png')}}"
+                         title="{% trans %}edit{% endtrans %}"/>
+                </a>
+            </td>
+            <td>
+                <a target="_blank" href="{{ application.homeUrl}}">
+                    <img src="{{ asset('bundles/rtsappmon/images/link_go.png')}}"
+                         title="{% trans %}open application (new tab/window){% endtrans %}"/>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+    <footer>
+
+    </footer>
+
+</article>
+<!-- end of stats article -->
+{% endblock%}
+
+{% block javascripts %}
+{{ parent() }}
+{#href="{{path('rts_appmon_default_updateall')}}"#}
+
+
+
+
+
+<script type="text/javascript" >
+    $(document).ready(function () {
+        $('#progressbar').bind('progressbarcomplete', function () {
+            $('.alert_info').html('{%trans%}Done with refreshing applications (refresh page for updating meta data){%endtrans%}')
+                    .fadeIn()
+                    .delay(5000)
+                    .fadeOut();
+            $('body').css('cursor', 'default');
+            $("#progressbar").progressbar('destroy');
+            $('input.app-update-all').removeAttr('disabled').addClass('alt_btn').css('cursor', 'default');
+        });
+
+        $('.app-update-all').on("click", function () {
+            $('input.app-update-all').attr('disabled', 'disabled').removeClass('alt_btn').css('cursor', 'not-allowed');
+            $("#progressbar").progressbar({ value:0 });
+            $("#progressbar").progressbar('widget').find('div').text('{%trans%}Loading{%endtrans%} ' + '0' + ' %');
+            var totalApps = $('.app-link').length;
+            $('.app-link').each(function () {
+                $('body').css('cursor', 'wait');
+                $.ajax({
+                    url:'{{path('rts_appmon_default_update', {'id': ''})}}' + '/' + $(this).attr('data-id'),
+                    dataType:'json',
+                    cache: false,
+                    success:function (data) {
+                        if (data.success) {
+                            var dataRow = $('.app-row[data-id=' + data.record.id + ']');
+                            dataRow.effect('highlight', {}, 3000);
+                            dataRow.find('.app-name').text(data.record.name);
+                            dataRow.find('.app-version').text(data.record.version);
+                            dataRow.find('.app-http-status span')
+                                    .removeClass('http-status-200')
+                                    .text(data.record.status)
+                                    .addClass('http-status-' + data.record.status);
+                        }
+
+
+                        var progressVal = $('#progressbar').progressbar('value') + (100 / totalApps);
+                        progressVal = Math.ceil(progressVal);
+                        $("#progressbar").progressbar({ value:progressVal });
+                        $("#progressbar").progressbar('widget')
+                                .find('div')
+                                .text('{%trans%}Loading{%endtrans%} ' + progressVal.toFixed(0) + ' %');
+
+                    }
+                });
+            });
+
+
+            return false;
+        });
+    });
+
+</script>
+{% endblock%}

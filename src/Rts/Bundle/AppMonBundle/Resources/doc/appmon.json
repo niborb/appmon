@@ -1,0 +1,10 @@
+{
+    "name":"Dummy App",
+    "description":"Dummy App Description 3",
+    "version":"1.1.0",
+    "meta_data_json":{
+        "Symfony":"2.0.14-DEV",
+        "PHP":"5.3.9-ZS5.6.0"
+    }
+}
+

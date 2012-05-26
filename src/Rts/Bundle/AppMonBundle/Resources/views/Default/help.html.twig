@@ -1,0 +1,71 @@
+{% extends 'RtsAppMonBundle::layout.html.twig' %}
+{% block secondary_bar%}
+{{ parent()}}
+<div id="progressbar"></div>
+{% endblock%}
+{% block content %}
+<article class="module width_full" xmlns="http://www.w3.org/1999/html">
+    <header><h3>How to use <i>Appmon?</h3>
+    </header>
+
+
+    <div class="module_content">
+        <h2>Add an app</h2>
+        <ul>
+            <li>Click on 'New App' in the menu in the left sidebar.</li>
+            <li>
+                If the application support the AppMon JSON versioning API, you can add the JSON Appmon API url (start
+                with http or https (!). If not then add
+                the homepage URL of your application.<br/>
+                If you do not enter any information in the 'Name' field, then AppMon will retrieve it from the HTML
+                TITLE tag of
+                your application. But you can override it here, if you want. <br/>
+                The 'Version' field will be filled automatically if your application support the JSON versioning API.
+                Otherwise
+                you can add an regex if the version number is in the HTML source of your application
+                for instance:
+                <pre><code>/!<-- version: (.*) -->/</code></pre>
+                <code>(.*)</code> is the part where in your code the version
+                number is printed. But of course, you can use other regular expressions as wel.<br/><br/>
+                Click on 'Save' to save the application. AppMon will automatically try to fill in the information from
+                the API or
+                HTML source.
+            </li>
+        </ul>
+        <h2>Example</h2>
+        AppMon itself also support the AppMon Version Api. <br/>You can test this by adding a new application, and
+        then add the following API URL <strong>{{url('rts_appmon_default_version')}}</strong>
+
+        <h2>JSON API</h2>
+        If you want to implement the AppMon JSON API in your application, you should have an URL which returns
+        JSON (content-type: text/json) with the following structure. <br/>
+        All fields are required, although currently the 'description' field is not visible in AppMon. <br/>
+        In the 'meta_data_json' array you can add additional information, you can add here as manu sub elements as you like. <br/>
+        The information is visible in the AppMon list view under the 'details' link next to the App's Name. Of course your application
+        could generate this JSON on-the-fly or use a static compiled one.
+
+        <pre><code>
+            {
+                "name":"AppMon",
+                "description":"AppMon - monitors application versioning information",
+                "version":"0.0.1",
+                "meta_data_json":
+                {
+                    "Symfony":"2.0.14-DEV",
+                    "PHP":"5.3.9-ZS5.6.0",
+                    "MySQL":"5.1.54"
+                }
+            }
+        </code></pre>
+
+    </div>
+
+
+    <footer>
+
+    </footer>
+
+</article>
+<!-- end of stats article -->
+{% endblock%}
+
