@@ -19,7 +19,7 @@ http-vhosts.conf:
        # change the path to the location of AppMon (add /web to the end of the path)
        DocumentRoot "/var/www/AppMon/web"
 
-       # the domain name where
+       # the domain name
        ServerName app-mon.localhost
        ErrorLog "logs/app-mon-localhost"
        CustomLog "logs/app-mon.localhost" common
