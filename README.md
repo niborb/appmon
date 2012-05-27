@@ -41,7 +41,7 @@ http-vhosts.conf:
     database_password =
 
 2.3
-Open your console/terminal. And go to the folder where you have installed AppMon
+Open your console/terminal. And go to the directory where you have installed AppMon
 (for instance /var/www/Appmon)
 
     cd /var/wwww/AppMon/web
@@ -49,6 +49,9 @@ Open your console/terminal. And go to the folder where you have installed AppMon
     php app/console doctrine:schema:create
 
 That's all, now you fire up your browser and go the configured URL.
+
+Note!
+The application is not secured by any authorization and or ACL. This is your own responsibility.
 
 
 
