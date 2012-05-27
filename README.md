@@ -46,6 +46,7 @@ Open your console/terminal. And go to the directory where you have installed App
 (for instance /var/www/Appmon)
 
 First we run a command which does some basic checks (file permissions, php version, date-time zone etc)
+
     cd /var/wwww/AppMon/web
     php app/check.php
     
