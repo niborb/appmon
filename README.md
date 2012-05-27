@@ -41,10 +41,16 @@ http-vhosts.conf:
     database_password =
 
 2.3
+
 Open your console/terminal. And go to the directory where you have installed AppMon
 (for instance /var/www/Appmon)
 
+First we run a command which does some basic checks (file permissions, php version, date-time zone etc)
     cd /var/wwww/AppMon/web
+    php app/check.php
+    
+Correct anything if necessary, and then run the following two commands:
+    
     php app/console doctrine:database:create
     php app/console doctrine:schema:create
 
