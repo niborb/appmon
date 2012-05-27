@@ -29,6 +29,7 @@ http-vhosts.conf:
 ===========
 
 2.1 cp parameters.dist.ini (</path/to/appmon>/app/config/) to parameters.ini
+
 2.2 open parameters.ini in your text editor, and change, if necessary the
  database settings:
 
