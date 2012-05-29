@@ -6,6 +6,12 @@ www: http://niborb.github.com/appmon
 How to install?
 ===============
 
+0. Requirements
+
+GIT should be installed, and accessible from your PATH.
+
+http://git-scm.com/
+
 1. Apache - VirtualHost
 =======================
 
@@ -52,6 +58,9 @@ First we run a command which does some basic checks (file permissions, php versi
     cd /var/wwww/AppMon
     php app/check.php
     
+Install dependencies
+    php bin/vendors update
+
 Correct anything if necessary, and then run the following two commands:
     
     php app/console doctrine:database:create
