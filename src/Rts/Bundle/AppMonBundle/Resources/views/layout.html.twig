@@ -73,17 +73,19 @@
 </section><!-- end of secondary bar -->
 
 <aside id="sidebar" class="column">
-    <form class="quick_search" action="{{path('rts_appmon_default_search')}}" method="post">
+    <form class="quick_search" action="{{path('rts_appmon_default_search')}}" method="get">
         <input type="text" name="search" value="{{app.request.get('search','Quick Search')}}"  onfocus="if(!this._haschanged){this.value=''};this._haschanged=true;">
     </form>
     <hr/>
     <h3>Menu</h3>
     <ul class="toggle">
-        <li class="icn_new_article"><a href="{{path('rts_appmon_default_add')}}">New App</a></li>
+        <li class="icn_new_article"><a href="{{path('rts_appmon_default_add')}}">{% trans %}New App{% endtrans %}</a></li>
+        <li class="icn_tags"><a href="{{ path('rts_appmon_category_add')}}">{% trans %}New Category {% endtrans %}</a></li>
         {#<li class="icn_new_article"><a href="{{path('rts_appmon_server_add')}}">New Server</a></li>#}
-        <li class="icn_categories"><a href="{{path('rts_appmon_default_list')}}">App list</a></li>
-        <li class="icn_categories"><a href="{{path('rts_appmon_server_list')}}">Server list</a></li>
-        {#<li class="icn_tags"><a href="#">Tags</a></li>#}
+        <li class="icn_categories"><a href="{{path('rts_appmon_default_list')}}">{% trans %}App list{% endtrans %}</a></li>
+        <li class="icn_categories"><a href="{{path('rts_appmon_server_list')}}">{% trans %}Server list{% endtrans %}</a></li>
+        <li class="icn_categories"><a href="{{path('rts_appmon_category_list')}}">{% trans %}Category list{% endtrans %}</a></li>
+
     </ul>
 
 

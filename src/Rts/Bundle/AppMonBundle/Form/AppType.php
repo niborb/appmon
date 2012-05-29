@@ -14,8 +14,8 @@ class AppType extends AbstractType
 
             ->add('api_regex')
             ->add('name')
+            ->add('category')
 //            ->add('server')l
-//            ->add('description')
 //            ->add('meta_data_json')
             ->add('version')
 //            ->add('http_status')

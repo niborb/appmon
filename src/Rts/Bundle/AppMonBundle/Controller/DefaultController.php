@@ -3,6 +3,7 @@
 namespace Rts\Bundle\AppMonBundle\Controller;
 
 use Rts\Bundle\AppMonBundle\Entity\App;
+use Rts\Bundle\AppMonBundle\Entity\AppCategory;
 use Rts\Bundle\AppMonBundle\Entity\Server;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -142,6 +143,17 @@ class DefaultController extends Controller
 
         $app->setServer($server);
 
+        $validator = $this->get('validator');
+        $errors = $validator->validate($app);
+
+        if (count($errors) > 0) {
+            $this->get('session')->setFlash('error', '"' . $app . '" could not be updated. Data is not valid');
+            $this->getLogger()->notice('Could not update App, because data is not valid', $errors);
+            $this->redirect(
+                $this->generateUrl('rts_appmon_default_list')
+            );
+        }
+
         $em = $this->getDoctrine()->getEntityManager();
         $em->persist($app);
         $em->persist($server);
@@ -174,8 +186,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/app/search")
-     * @Template("RtsAppMonBundle:Default:list.html.twig")
+     * @Route("/app/search.{_format}", defaults={"_format" = "html"}, requirements={"_format" = "html|xml"})
      * @param $search
      * @return array
      */
@@ -184,19 +195,20 @@ class DefaultController extends Controller
         $search = $this->getRequest()->get('search');
         $em = $this->getDoctrine()->getEntityManager();
         $qb = $em->createQueryBuilder();
-        $qb->select('a, s')
+        $qb->select('a, s, c')
             ->from('RtsAppMonBundle:App', 'a')
             ->join('a.server', 's')
+            ->leftJoin('a.category', 'c')
             ->where(
             $qb->expr()->like('s.hostname', ':search')
         )->orWhere(
             $qb->expr()->like('s.ip_address', ':search')
         )->orWhere(
-            $qb->expr()->like('s.description', ':search')
-        )->orWhere(
             $qb->expr()->like('a.name', ':search')
         )->orWhere(
             $qb->expr()->like('a.meta_data_json', ':search')
+        )->orWhere(
+            $qb->expr()->like('c.name', ':search')
         )
             ->orderBy('s.hostname', 'ASC')
             ->setParameter('search', "%$search%");
@@ -207,30 +219,32 @@ class DefaultController extends Controller
             $this->get('translator')->trans('You searched for "%s". %s application(s) found'),
             $search, count($apps)));
 
-        return array('apps' => $apps);
+        $format = $this->getRequest()->getRequestFormat();
+        return $this->render(
+            'RtsAppMonBundle:Default:list.' . $format . '.twig',
+            array('apps' => $apps)
+        );
     }
 
     /**
-     * @Route("/appmon/version/")
+     * @Route("/appmon/version.{_format}", defaults={"_format" = "json"}, requirements={"_format" = "json"})
+     * @Template()
      */
     public function versionAction()
     {
-        $response = new Response(
-            json_encode(
+        return
+            array(
+                'response' =>
                 array(
                     'name' => 'AppMon',
-                    'description' => 'AppMon - monitors application versioning information',
                     'version' => '0.0.1',
                     'meta_data_json' => array(
                         "Symfony" => "2.0.14-DEV",
-                        "PHP" => "5.3.9-ZS5.6.0",
+                        "PHP" => PHP_VERSION,
                         "MySQL" => "5.1.54"
                     )
-                ))
-        );
-        $response->headers->set('Content-type', 'text/json');
-        return $response;
-
+                )
+            );
     }
 
     /**
@@ -243,7 +257,23 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/app/list/{id}", requirements={"id" = "\d+"}, defaults={"id" = NULL})
+     * @Route("/app/list.by.category/{id}", requirements={"id" = "\d+"})
+     * @Method({"GET"})
+     * @Template("RtsAppMonBundle:Default:list.html.twig")
+     */
+    public function listByCategoryAction(AppCategory $category)
+    {
+        $apps = $this->getDoctrine()->getRepository('RtsAppMonBundle:App')
+            ->findBy(array('category' => $category->getId()));
+
+
+        return array(
+            'apps' => $apps
+        );
+    }
+
+    /**
+     * @Route("/app/{id}/list.{_format}", requirements={"id" = "\d+", "_format" = "html|xml"}, defaults={"id" = 0, "_format" = "html"})
      * @Route("/{id}", requirements={"id" = "\d+"}, defaults={"id" = NULL})
      * @Template()
      */

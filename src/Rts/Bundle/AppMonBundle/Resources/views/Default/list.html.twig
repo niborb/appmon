@@ -1,11 +1,17 @@
 {% extends 'RtsAppMonBundle::layout.html.twig' %}
+
+{% block stylesheets %}
+{{ parent() }}
+{% endblock %}
+
+
 {% block secondary_bar%}
 {{ parent()}}
 <div id="progressbar"></div>
 {% endblock%}
 {% block content %}
 <article class="module width_full" xmlns="http://www.w3.org/1999/html">
-    <header><h3>App list</h3>
+    <header><h3>{% trans %}App list{% endtrans %}</h3>
 
         <div class="submit_link">
             <form>
@@ -19,10 +25,11 @@
     <table class="tablesorter" cellspacing="0">
         <thead>
         <tr>
-            <th width="180">Server</th>
-            <th class="app-description">Name</th>
-            <th>Version</th>
-            <th class="http-status">Status</th>
+            <th width="180">{% trans %}Server{% endtrans%}</th>
+            <th>{% trans %}Category{% endtrans %}</th>
+            <th class="app-description">{% trans %}Name{% endtrans %}</th>
+            <th>{% trans %}Version{% endtrans %}</th>
+            <th class="http-status">{% trans %}Status{% endtrans %}</th>
             <th colspan="4">&nbsp;</th>
         </tr>
         </thead>
@@ -34,6 +41,7 @@
             <td><a class="app-link" data-id="{{application.id}}"
                    href="{{path('rts_appmon_server_edit', {'id':application.server.id})}}">{{ application.server }}</a>
             </td>
+            <td>{{ application.category}}</td>
             <td><span class="app-name">{{ application.name }}</span>
                 {% if application.metaData|length > 0 %}
                     <span>
@@ -82,12 +90,7 @@
         </tr>
         {% endfor %}
         </tbody>
-
     </table>
-    <footer>
-
-    </footer>
-
 </article>
 <!-- end of stats article -->
 {% endblock%}
@@ -100,7 +103,9 @@
 
 
 
-<script type="text/javascript" >
+
+
+<script type="text/javascript">
     $(document).ready(function () {
         $('#progressbar').bind('progressbarcomplete', function () {
             $('.alert_info').html('{%trans%}Done with refreshing applications (refresh page for updating meta data){%endtrans%}')
@@ -122,7 +127,7 @@
                 $.ajax({
                     url:'{{path('rts_appmon_default_update', {'id': ''})}}' + '/' + $(this).attr('data-id'),
                     dataType:'json',
-                    cache: false,
+                    cache:false,
                     success:function (data) {
                         if (data.success) {
                             var dataRow = $('.app-row[data-id=' + data.record.id + ']');

@@ -37,13 +37,6 @@ class App
     private $api_url;
 
     /**
-     * @var string $description
-     *
-     * @ORM\Column(name="description", type="string", length=255, nullable=true)
-     */
-    private $description;
-
-    /**
      * @var text $meta_data_json
      *
      * @ORM\Column(name="meta_data_json", type="text", nullable=true)
@@ -84,6 +77,14 @@ class App
      * @ORM\JoinColumn(name="server_id", referencedColumnName="id")
      */
     private $server;
+
+    /**
+     * @var \Rts\AppMonBundle\Entity\AppCategory
+     * @ORM\ManyToOne(targetEntity="AppCategory", inversedBy="apps")
+     * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
+     */
+    private $category;
+
 
     /**
      * constructor
@@ -148,28 +149,6 @@ class App
     public function getApiUrl()
     {
         return $this->api_url;
-    }
-
-    /**
-     * Set description
-     *
-     * @param string $description
-     */
-    public function setDescription($description)
-    {
-        if (!empty($description)) {
-            $this->description = $description;
-        }
-    }
-
-    /**
-     * Get description
-     *
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
     }
 
     /**
@@ -318,14 +297,9 @@ class App
             $this->setName($data['name']);
         }
 
-        if (array_key_exists('description', $data)) {
-            $this->setDescription($data['description']);
-        }
-
         if (array_key_exists('meta_data_json', $data)) {
             $this->setMetaDataJson(json_encode($data['meta_data_json']));
         }
-
 
         if (array_key_exists('version', $data)) {
             if (!empty($data['version'])) {
@@ -372,10 +346,6 @@ class App
             $data = array();
 
             // find version
-
-            // debug:
-//            $this->setApiRegex("/<!-- version (.*) -->/");
-
             $pattern = $this->getApiRegex();
             $data['version'] = null;
             if (!empty($pattern)) {
@@ -391,8 +361,7 @@ class App
 
             try {
                 $data['name'] = $crawler->filter('title')->text();
-                $data['description'] = $crawler->filter('meta[name=description]')->attr('content');
-            } catch (\Exception $e) {
+             } catch (\Exception $e) {
             }
 
         }
@@ -473,6 +442,22 @@ class App
     public function __toString()
     {
         return $this->getName() . ' (#' . $this->getId() . ')';
+    }
+
+    /**
+     * @param \Rts\AppMonBundle\Entity\AppCategory $category
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
+    }
+
+    /**
+     * @return \Rts\AppMonBundle\Entity\AppCategory
+     */
+    public function getCategory()
+    {
+        return $this->category;
     }
 
 }

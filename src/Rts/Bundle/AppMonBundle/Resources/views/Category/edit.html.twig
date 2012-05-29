@@ -4,9 +4,9 @@
 
 {% block content %}
 
-<form action="{{ path('rts_appmon_default_post', {'id': application.id}) }}" method="post" {{ form_enctype(form) }}>
+<form action="{{ path('rts_appmon_category_post', {'id': category.id}) }}" method="post" {{ form_enctype(form) }}>
 <article class="module width_full">
-    <header><h3>{% trans %}Add/Edit App{% endtrans %} {{application.name}}</h3></header>
+    <header><h3>{% trans %}Add/Edit Category{% endtrans %} {{category.name}}</h3></header>
     <div class="module_content">
             {{ form_widget(form) }}
     </div>
