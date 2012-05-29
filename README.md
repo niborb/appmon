@@ -59,6 +59,7 @@ First we run a command which does some basic checks (file permissions, php versi
     php app/check.php
     
 Install dependencies
+
     php bin/vendors update
 
 Correct anything if necessary, and then run the following two commands:
