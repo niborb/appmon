@@ -186,7 +186,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/app/search.{_format}", defaults={"_format" = "html"}, requirements={"_format" = "html|xml|rss"})
+     * @Route("/app/search.{_format}", defaults={"_format" = "html"}, requirements={"_format" = "html|xml|rdf"})
      * @param $search
      * @return array
      */
@@ -226,10 +226,6 @@ class DefaultController extends Controller
             array('apps' => $apps)
         );
         
-        if ($format == 'rss') {
-            $response->headers->set('Content-type', 'text/xml');
-        }
-
         return $response;
     }
 
@@ -264,9 +260,8 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/app/list.by.category/{id}", requirements={"id" = "\d+"})
+     * @Route("/app/{id}/list.by.category.{_format}", requirements={"id" = "\d+", "_format" = "html|xml|rdf"}, defaults={"id" = 0, "_format" = "html"})
      * @Method({"GET"})
-     * @Template("RtsAppMonBundle:Default:list.html.twig")
      */
     public function listByCategoryAction(AppCategory $category)
     {
@@ -274,13 +269,17 @@ class DefaultController extends Controller
             ->findBy(array('category' => $category->getId()));
 
 
-        return array(
-            'apps' => $apps
+        $format = $this->getRequest()->getRequestFormat();
+        $response = $this->render(
+            'RtsAppMonBundle:Default:list.' . $format . '.twig',
+            array('apps' => $apps)
         );
+
+        return $response;
     }
 
     /**
-     * @Route("/app/{id}/list.{_format}", requirements={"id" = "\d+", "_format" = "html|xml|rss"}, defaults={"id" = 0, "_format" = "html"})
+     * @Route("/app/{id}/list.{_format}", requirements={"id" = "\d+", "_format" = "html|xml|rdf"}, defaults={"id" = 0, "_format" = "html"})
      * @Route("/{id}", requirements={"id" = "\d+"}, defaults={"id" = NULL})
      */
     public function listAction(Server $server = NULL)
@@ -308,10 +307,6 @@ class DefaultController extends Controller
         	'RtsAppMonBundle:Default:list.' . $format . '.twig',
         	array('apps' => $apps)
         );
-        
-        if ($format == 'rss') {
-            $response->headers->set('Content-type', 'text/xml');
-        }
         
         return $response;
     }
