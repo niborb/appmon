@@ -1,29 +1,27 @@
 <?xml version="1.0" ?>
-<rss version="2.0">
-    <channel>
-        <title>{% trans %}App list {% endtrans %}</title>
-        <link></link>
-        <description></description>
+<appmon>
+    <apps>
         {% for application in apps %}
-        <item>
-            <title>{{application.name}} {{application.version}}</title>
-            <link>{{application.homeUrl}}</link>
-            <description><![CDATA[
-                Version: {{application.version}} <br/>
-                Server: {{application.server}} <br/>
-                Category: {{application.category}}<br/>
-                {% if application.metaData|length > 0 %}
-                Meta:<ul>
-                    {% for key, meta in application.metaData %}
-                    <li>{{key}}: {{meta}} </li>
-
-                    {% endfor %}
-                </ul>
-                {% endif %}
-
-
-            ]]></description>
-        </item>
+        <app>
+            <name>{{application.name}}</name>
+            <version>{{application.version}}</version>
+            <homepage>{{application.homeUrl}}</homepage>
+            <category>{{application.category}}</category>
+            <server>
+                <ip>{{application.server.ipAddress}}</ip>
+                <name>{{application.server.description}}</name>
+                <host>{{application.server.hostname}}</host>
+            </server>
+            {% if application.metaData|length > 0 %}
+             <meta>
+                {% for key, meta in application.metaData %}
+                <item>{{key}}: {{meta}} </item>
+                {% endfor %}
+            </meta>
+            {% else %}
+            <meta />    
+            {% endif %}
+        </app>
         {% endfor %}
-    </channel>
-</rss>
+    </apps>
+</appmon>
