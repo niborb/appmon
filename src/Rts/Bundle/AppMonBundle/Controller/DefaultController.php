@@ -186,7 +186,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/app/search.{_format}", defaults={"_format" = "html"}, requirements={"_format" = "html|xml"})
+     * @Route("/app/search.{_format}", defaults={"_format" = "html"}, requirements={"_format" = "html|xml|rss"})
      * @param $search
      * @return array
      */
@@ -220,10 +220,17 @@ class DefaultController extends Controller
             $search, count($apps)));
 
         $format = $this->getRequest()->getRequestFormat();
-        return $this->render(
+        
+        $response = $this->render(
             'RtsAppMonBundle:Default:list.' . $format . '.twig',
             array('apps' => $apps)
         );
+        
+        if ($format == 'rss') {
+            $response->headers->set('Content-type', 'text/xml');
+        }
+
+        return $response;
     }
 
     /**
@@ -273,9 +280,8 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/app/{id}/list.{_format}", requirements={"id" = "\d+", "_format" = "html|xml"}, defaults={"id" = 0, "_format" = "html"})
+     * @Route("/app/{id}/list.{_format}", requirements={"id" = "\d+", "_format" = "html|xml|rss"}, defaults={"id" = 0, "_format" = "html"})
      * @Route("/{id}", requirements={"id" = "\d+"}, defaults={"id" = NULL})
-     * @Template()
      */
     public function listAction(Server $server = NULL)
     {
@@ -297,7 +303,17 @@ class DefaultController extends Controller
 
         $apps = $qb->getQuery()->getResult();
 
-        return array('apps' => $apps);
+        $format = $this->getRequest()->getRequestFormat();
+        $response = $this->render(
+        	'RtsAppMonBundle:Default:list.' . $format . '.twig',
+        	array('apps' => $apps)
+        );
+        
+        if ($format == 'rss') {
+            $response->headers->set('Content-type', 'text/xml');
+        }
+        
+        return $response;
     }
 }
 
