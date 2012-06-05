@@ -70,7 +70,7 @@
                          title="{% trans %}delete{% endtrans %}"/>
                 </a>
             </td>
-            <td><a href="{{path('rts_appmon_default_update', {'id': application.id}) }}">
+            <td><a href="javascript:updateSelectedApp({{ application.id }})">
                 <img src="{{ asset('bundles/rtsappmon/images/database_refresh.png')}}"
                      title="{% trans %}update{% endtrans %}"/>
             </a>
@@ -99,13 +99,51 @@
 {{ parent() }}
 {#href="{{path('rts_appmon_default_updateall')}}"#}
 
-
-
-
-
-
-
 <script type="text/javascript">
+    // update a single app
+    function updateSelectedApp(id) {
+        initProgressBar();
+        appUpdate(id, 1);
+
+    }
+
+    // initalize progress bar
+    function initProgressBar() {
+        $('input.app-update-all').attr('disabled', 'disabled').removeClass('alt_btn').css('cursor', 'not-allowed');
+        $("#progressbar").progressbar({ value:0 });
+        $("#progressbar").progressbar('widget').find('div').text('{%trans%}Loading{%endtrans%} ' + '0' + ' %');
+    }
+
+    // retrieve app update data from server
+    function appUpdate(id, totalApps) {
+        $.ajax({
+            url:'{{path('rts_appmon_default_update', {'id': ''})}}' + '/' + id,
+            dataType:'json',
+            cache:false,
+            success:function (data) {
+                if (data.success) {
+                    var dataRow = $('.app-row[data-id=' + data.record.id + ']');
+                    dataRow.effect('highlight', {}, 3000);
+                    dataRow.find('.app-name').text(data.record.name);
+                    dataRow.find('.app-version').text(data.record.version);
+                    dataRow.find('.app-http-status span')
+                            .removeClass('http-status-200')
+                            .text(data.record.status)
+                            .addClass('http-status-' + data.record.status);
+                }
+
+
+                var progressVal = $('#progressbar').progressbar('value') + (100 / totalApps);
+                progressVal = Math.ceil(progressVal);
+                $("#progressbar").progressbar({ value:progressVal });
+                $("#progressbar").progressbar('widget')
+                        .find('div')
+                        .text('{%trans%}Loading{%endtrans%} ' + progressVal.toFixed(0) + ' %');
+
+            }
+        });
+    }
+
     $(document).ready(function () {
         $('#progressbar').bind('progressbarcomplete', function () {
             $('.alert_info').html('{%trans%}Done with refreshing applications (refresh page for updating meta data){%endtrans%}')
@@ -117,41 +155,16 @@
             $('input.app-update-all').removeAttr('disabled').addClass('alt_btn').css('cursor', 'default');
         });
 
+
+        // update all apps
         $('.app-update-all').on("click", function () {
-            $('input.app-update-all').attr('disabled', 'disabled').removeClass('alt_btn').css('cursor', 'not-allowed');
-            $("#progressbar").progressbar({ value:0 });
-            $("#progressbar").progressbar('widget').find('div').text('{%trans%}Loading{%endtrans%} ' + '0' + ' %');
             var totalApps = $('.app-link').length;
+            initProgressBar();
+
             $('.app-link').each(function () {
                 $('body').css('cursor', 'wait');
-                $.ajax({
-                    url:'{{path('rts_appmon_default_update', {'id': ''})}}' + '/' + $(this).attr('data-id'),
-                    dataType:'json',
-                    cache:false,
-                    success:function (data) {
-                        if (data.success) {
-                            var dataRow = $('.app-row[data-id=' + data.record.id + ']');
-                            dataRow.effect('highlight', {}, 3000);
-                            dataRow.find('.app-name').text(data.record.name);
-                            dataRow.find('.app-version').text(data.record.version);
-                            dataRow.find('.app-http-status span')
-                                    .removeClass('http-status-200')
-                                    .text(data.record.status)
-                                    .addClass('http-status-' + data.record.status);
-                        }
-
-
-                        var progressVal = $('#progressbar').progressbar('value') + (100 / totalApps);
-                        progressVal = Math.ceil(progressVal);
-                        $("#progressbar").progressbar({ value:progressVal });
-                        $("#progressbar").progressbar('widget')
-                                .find('div')
-                                .text('{%trans%}Loading{%endtrans%} ' + progressVal.toFixed(0) + ' %');
-
-                    }
-                });
+                appUpdate($(this).attr('data-id'), totalApps);
             });
-
 
             return false;
         });
