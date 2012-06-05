@@ -37,6 +37,13 @@ class App
     private $api_url;
 
     /**
+     * @var text $meta_local_data
+     *
+     * @ORM\Column(name="meta_local_data", type="text", nullable=true)
+     */
+    private $meta_local_data;
+
+    /**
      * @var text $meta_data_json
      *
      * @ORM\Column(name="meta_data_json", type="text", nullable=true)
@@ -74,14 +81,14 @@ class App
     /**
      * @var \Rts\AppMonBundle\Entity\Server
      * @ORM\ManyToOne(targetEntity="Server", inversedBy="apps")
-     * @ORM\JoinColumn(name="server_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="server_id", referencedColumnName="id", nullable=true)
      */
     private $server;
 
     /**
      * @var \Rts\AppMonBundle\Entity\AppCategory
      * @ORM\ManyToOne(targetEntity="AppCategory", inversedBy="apps")
-     * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="category_id", referencedColumnName="id", nullable=true)
      */
     private $category;
 
@@ -269,7 +276,7 @@ class App
      *
      * @param Rts\Bundle\AppMonBundle\Entity\Server $server
      */
-    public function setServer(\Rts\Bundle\AppMonBundle\Entity\Server $server)
+    public function setServer(\Rts\Bundle\AppMonBundle\Entity\Server $server = NULL)
     {
         $this->server = $server;
     }
@@ -447,7 +454,7 @@ class App
     /**
      * @param \Rts\AppMonBundle\Entity\AppCategory $category
      */
-    public function setCategory($category)
+    public function setCategory($category = NULL)
     {
         $this->category = $category;
     }
@@ -458,6 +465,45 @@ class App
     public function getCategory()
     {
         return $this->category;
+    }
+
+    /**
+     * @param string $meta_local_data
+     */
+    public function setMetaLocalData($meta_local_data)
+    {
+        $this->meta_local_data = $meta_local_data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMetaLocalDataArray()
+    {
+        $data = array();
+
+        // split on ;
+        $items = explode(';', $this->meta_local_data);
+
+        foreach ($items as $item) {
+            @list ($key, $value) = explode('=', $item);
+            $key = str_replace("\"", "", $key);
+            $value = str_replace("\"", "", $value);
+
+            if ('' != $key) {
+                $data[$key] = $value;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @return \Rts\Bundle\AppMonBundle\Entity\text
+     */
+    public function getMetaLocalData()
+    {
+        return $this->meta_local_data;
     }
 
 }

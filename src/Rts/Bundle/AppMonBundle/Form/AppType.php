@@ -14,12 +14,16 @@ class AppType extends AbstractType
 
             ->add('api_regex')
             ->add('name')
-            ->add('category')
+            ->add('category', null, array('empty_value' => 'None', 'required' => false))
+            ->add('server', null, array('empty_value' => 'Automatically detect server', 'required' => false))
 //            ->add('server')l
+            ->add('meta_local_data')
 //            ->add('meta_data_json')
             ->add('version')
 //            ->add('http_status')
-            ->add('home_url');
+            ->add('home_url')
+
+        ;
     }
 
     public function getName()

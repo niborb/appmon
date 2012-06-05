@@ -12,15 +12,17 @@
                 <name>{{application.server.description}}</name>
                 <host>{{application.server.hostname}}</host>
             </server>
-            {% if application.metaData|length > 0 %}
+
              <meta>
                 {% for key, meta in application.metaData %}
                 <item id="{{key}}">{{meta}}</item>
                 {% endfor %}
+
+                {% for key, meta in application.metaLocalDataArray() %}
+                <item id="{{key|escape}}">{{meta}}</item>
+                {% endfor %}
             </meta>
-            {% else %}
-            <meta />    
-            {% endif %}
+
         </app>
         {% endfor %}
     </apps>
