@@ -43,7 +43,7 @@
             </td>
             <td>{{ application.category}}</td>
             <td><span class="app-name">{{ application.name }}</span>
-                {% if application.metaData|length > 0 %}
+                {% if (application.metaData|length > 0) or (application.metaLocalDataArray()|length > 0)%}
                     <span>
                         <a onclick="$('#details-{{application.id}}').toggle();" style="cursor:context-menu">
                             {%trans%}(details){% endtrans%}
@@ -55,6 +55,11 @@
                         {% for key, meta in application.metaData %}
                         <li>{{key}}: {{meta}}</li>
                         {% endfor %}
+
+                        {% for key, meta in application.metaLocalDataArray() %}
+                            <li>{{key}}: {{meta}}</li>
+                        {% endfor %}
+
                     </ul>
                 </div>
                 {% endif %}
