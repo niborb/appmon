@@ -15,7 +15,7 @@
             {% if application.metaData|length > 0 %}
              <meta>
                 {% for key, meta in application.metaData %}
-                <item>{{key}}: {{meta}} </item>
+                <item id="{{key}}">{{meta}}</item>
                 {% endfor %}
             </meta>
             {% else %}
