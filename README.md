@@ -1,4 +1,4 @@
-AppMon (0.0.1)
+AppMon
 ==============
 www: http://niborb.github.com/appmon
 
