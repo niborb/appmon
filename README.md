@@ -56,6 +56,7 @@ Open your console/terminal. And go to the directory where you have installed App
 First we run a command which does some basic checks (file permissions, php version, date-time zone etc)
 
     cd /var/wwww/AppMon
+    mkdir app/cache app/logs
     php app/check.php
     
 Install dependencies
