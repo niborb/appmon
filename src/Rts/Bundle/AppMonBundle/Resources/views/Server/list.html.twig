@@ -6,6 +6,7 @@
     <table class="tablesorter" cellspacing="0">
         <thead>
         <tr>
+            <th>{% trans %}#{% endtrans %}</th>
             <th>{% trans %}Description{% endtrans %}</th>
             <th>{% trans %}Hostname{% endtrans %}</th>
             <th>{% trans %}IP{% endtrans %}</th>
@@ -17,6 +18,7 @@
 
         {% for server in servers %}
         <tr>
+            <td>{{ server.id }}</td>
             <td>{{ server.description }}</td>
             <td>{{ server.hostname }}</td>
             <td>{{ server.ipAddress }}</td>
