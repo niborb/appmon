@@ -354,7 +354,8 @@ class App
 
             // find version
             $pattern = $this->getApiRegex();
-            $data['version'] = null;
+            $data['version'] = '';
+
             if (!empty($pattern)) {
                 // try to use regex to retrieve version information from raw content
                 $matches = array();
