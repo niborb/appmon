@@ -129,19 +129,22 @@ class DefaultController extends Controller
 
 
         // check if the app is located on a new server
-        $serverIpAddress = $app->getServerIpAddressByUrl($app->getApiUrl());
 
-        $server = $this->getDoctrine()
-            ->getRepository('RtsAppMonBundle:Server')
-            ->findOneBy(array('ip_address' => $serverIpAddress));
-        if (!$server instanceof Server) {
-            $server = new Server();
-            $serverHostname = $app->getServerHostnameByUrl($app->getApiUrl());
-            $server->setHostname($serverHostname);
-            $server->setIpAddress($serverIpAddress);
+        if (! $app->getServer()) {
+            $serverIpAddress = $app->getServerIpAddressByUrl($app->getApiUrl());
+
+            $server = $this->getDoctrine()
+                ->getRepository('RtsAppMonBundle:Server')
+                ->findOneBy(array('ip_address' => $serverIpAddress));
+            if (!$server instanceof Server) {
+                $server = new Server();
+                $serverHostname = $app->getServerHostnameByUrl($app->getApiUrl());
+                $server->setHostname($serverHostname);
+                $server->setIpAddress($serverIpAddress);
+            }
+
+            $app->setServer($server);
         }
-
-        $app->setServer($server);
 
         $validator = $this->get('validator');
         $errors = $validator->validate($app);
@@ -156,7 +159,9 @@ class DefaultController extends Controller
 
         $em = $this->getDoctrine()->getEntityManager();
         $em->persist($app);
-        $em->persist($server);
+        if (isset($server)) {
+            $em->persist($server);
+        }
         $em->flush();
 
         // if called with ajax, return json response
@@ -186,6 +191,8 @@ class DefaultController extends Controller
     }
 
     /**
+     * TODO: move the search query to the AppRepository class
+     *
      * @Route("/app/search.{_format}", defaults={"_format" = "html"}, requirements={"_format" = "html|xml|rdf"})
      * @param $search
      * @return array
@@ -193,6 +200,10 @@ class DefaultController extends Controller
     public function searchAction()
     {
         $search = $this->getRequest()->get('search');
+
+        $server = $this->getRequest()->get('server');
+        $category = $this->getRequest()->get('category');
+
         $em = $this->getDoctrine()->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->select('a, s, c')
@@ -212,6 +223,17 @@ class DefaultController extends Controller
         )
             ->orderBy('s.hostname', 'ASC')
             ->setParameter('search', "%$search%");
+
+        if ($server) {
+            $qb->andWhere('s.id = :server');
+            $qb->setParameter('server', $server);
+        }
+
+        if ($category) {
+            $qb->andWhere('c.id = :category');
+            $qb->setParameter('category', $category);
+        }
+
 
         $apps = $qb->getQuery()->getResult();
 
