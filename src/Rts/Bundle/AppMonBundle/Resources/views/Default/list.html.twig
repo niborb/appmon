@@ -43,13 +43,14 @@
             </td>
             <td>{{ application.category}}</td>
             <td><span class="app-name">{{ application.name }}</span>
-                {% if (application.metaData|length > 0) or (application.metaLocalDataArray()|length > 0)%}
-                    <span>
-                        <a onclick="$('#details-{{application.id}}').toggle();" style="cursor:context-menu">
-                            {%trans%}(details){% endtrans%}
-                        </a>
-                    </span>
-
+                <span>
+                    <a class="app-details-link-{{application.id}}"
+                       style="cursor:context-menu;display: {% if (application.metaData|length > 0) or (application.metaLocalDataArray()|length > 0)%} inline; {%else%} none; {%endif%}"
+                       onclick="$('#details-{{application.id}}').toggle();"
+                       >
+                        {%trans%}(details){% endtrans%}
+                    </a>
+                </span>
                 <div class="app-details" id="details-{{application.id}}" style="display: none;">
                     <ul>
                         {% for key, meta in application.metaData %}
@@ -57,12 +58,11 @@
                         {% endfor %}
 
                         {% for key, meta in application.metaLocalDataArray() %}
-                            <li>{{key}}: {{meta}}</li>
+                        <li>{{key}}: {{meta}}</li>
                         {% endfor %}
 
                     </ul>
                 </div>
-                {% endif %}
             </td>
             <td class="app-version">{{ application.version}}</td>
             <td class="app-http-status">
@@ -104,6 +104,7 @@
 {{ parent() }}
 {#href="{{path('rts_appmon_default_updateall')}}"#}
 
+
 <script type="text/javascript">
     // update a single app
     function updateSelectedApp(id) {
@@ -128,6 +129,7 @@
             success:function (data) {
                 if (data.success) {
                     var dataRow = $('.app-row[data-id=' + data.record.id + ']');
+
                     dataRow.effect('highlight', {}, 3000);
                     dataRow.find('.app-name').text(data.record.name);
                     dataRow.find('.app-version').text(data.record.version);
@@ -135,6 +137,15 @@
                             .removeClass('http-status-200')
                             .text(data.record.status)
                             .addClass('http-status-' + data.record.status);
+
+                    $('#details-' + data.record.id).find('ul').remove();
+                    if (data.record.meta_data) {
+                        var detailsList = $('#details-' + data.record.id).append('<ul/>').find('ul');
+                        $.each(data.record.meta_data, function(key, val) {
+                            detailsList.append('<li>' + key + ': ' + val + '</li>');
+                        });
+                    }
+
                 }
 
 
@@ -151,7 +162,7 @@
 
     $(document).ready(function () {
         $('#progressbar').bind('progressbarcomplete', function () {
-            $('.alert_info').html('{%trans%}Done with refreshing applications (refresh page for updating meta data){%endtrans%}')
+            $('.alert_info').html('{%trans%}Done with refreshing applications{%endtrans%}')
                     .fadeIn()
                     .delay(5000)
                     .fadeOut();

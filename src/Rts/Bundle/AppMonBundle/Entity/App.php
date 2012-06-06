@@ -187,6 +187,10 @@ class App
     {
         $data = json_decode($this->getMetaDataJson(), true);
 
+        if (!$data) {
+            $data = array();
+        }
+
         return $data;
     }
 
@@ -436,12 +440,19 @@ class App
      */
     public function toArray()
     {
-        return array(
+        $meta = $this->getMetaData() + $this->getMetaLocalDataArray();
+        $data = array(
             'id' => $this->getId(),
             'name' => $this->getName(),
             'version' => $this->getVersion(),
             'status' => $this->getHttpStatus(),
         );
+
+        if (!empty($meta)) {
+            $data['meta_data'] = $meta;
+        }
+
+        return $data;
     }
 
     /**
