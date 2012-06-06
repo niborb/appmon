@@ -262,11 +262,10 @@ class DefaultController extends Controller
                 'response' =>
                 array(
                     'name' => 'AppMon',
-                    'version' => '0.0.1',
+                    'version' => 'dev',
                     'meta_data_json' => array(
-                        "Symfony" => "3.0.16-DEV",
+                        "Symfony" => \Symfony\Component\HttpKernel\Kernel::VERSION,
                         "PHP" => PHP_VERSION,
-                        "MySQL" => "5.1.54"
                     )
                 )
             );
