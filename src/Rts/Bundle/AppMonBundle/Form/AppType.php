@@ -13,6 +13,7 @@ class AppType extends AbstractType
             ->add('api_url')
 
             ->add('api_regex')
+            ->add('api_key')
             ->add('name')
             ->add('category', null, array('empty_value' => 'None', 'required' => false))
             ->add('server', null, array('empty_value' => 'Automatically detect server', 'required' => false))

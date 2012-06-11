@@ -37,6 +37,12 @@ class App
     private $api_url;
 
     /**
+     * @var string $api_key
+     * @ORM\Column(name="api_key", type="string", length=255, nullable=true)
+     */
+    private $api_key;
+
+    /**
      * @var text $meta_local_data
      *
      * @ORM\Column(name="meta_local_data", type="text", nullable=true)
@@ -313,9 +319,7 @@ class App
         }
 
         if (array_key_exists('version', $data)) {
-            if (!empty($data['version'])) {
-                $this->setVersion($data['version']);
-            }
+            $this->setVersion($data['version']);
         }
 
         if (array_key_exists('http_status', $data)) {
@@ -335,6 +339,10 @@ class App
      */
     public function getDataFromServer($url)
     {
+        if (!empty($this->api_key)) {
+            $url .= '?' . http_build_query(array('api_key' => $this->getApiKey()));
+        }
+
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
@@ -358,13 +366,13 @@ class App
 
             // find version
             $pattern = $this->getApiRegex();
-            $data['version'] = '';
+            $data['version'] = 'N/A';
 
             if (!empty($pattern)) {
                 // try to use regex to retrieve version information from raw content
                 $matches = array();
                 preg_match($pattern, $contents, $matches);
-                $version = isset($matches[1]) ? $matches[1] : NULL;
+                $version = isset($matches[1]) ? $matches[1] : 'N/A';
                 $data['version'] = $version;
             }
 
@@ -373,7 +381,8 @@ class App
 
             try {
                 $data['name'] = $crawler->filter('title')->text();
-             } catch (\Exception $e) {
+            } catch (\Exception $e) {
+
             }
 
         }
@@ -516,6 +525,22 @@ class App
     public function getMetaLocalData()
     {
         return $this->meta_local_data;
+    }
+
+    /**
+     * @param string $api_key
+     */
+    public function setApiKey($api_key)
+    {
+        $this->api_key = $api_key;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiKey()
+    {
+        return $this->api_key;
     }
 
 }

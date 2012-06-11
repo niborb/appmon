@@ -125,6 +125,11 @@ class DefaultController extends Controller
         } catch (\Exception $e) {
             $this->getLogger()->notice('Could not update App data from server because ' . $e->getMessage());
             $this->getLogger()->notice($e);
+
+            $this->get('session')->setFlash('error', '"' . $app . '" could not be updated because of unknown error');
+            $this->redirect(
+                $this->generateUrl('rts_appmon_default_list')
+            );
         }
 
 
@@ -252,11 +257,23 @@ class DefaultController extends Controller
     }
 
     /**
+     * Example to return version information in JSON
+     *
      * @Route("/appmon/version.{_format}", defaults={"_format" = "json"}, requirements={"_format" = "json"})
      * @Template()
      */
     public function versionAction()
     {
+
+        $this->getLogger()->info(sprintf('api_key %s', $this->getRequest()->get('api_key')));
+
+        $apiKey = $this->getRequest()->get('api_key');
+
+        // 40f4ec89b29a6acbf49b6dedcea3e8ec == md5('appmon')
+        if (NULL === $apiKey || $apiKey != '40f4ec89b29a6acbf49b6dedcea3e8ec') {
+            throw $this->createNotFoundException();
+        }
+
         return
             array(
                 'response' =>
