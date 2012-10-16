@@ -36,14 +36,14 @@ http-vhosts.conf:
 2. Database
 ===========
 
-2.1 cp parameters.dist.ini (</path/to/appmon>/app/config/) to parameters.ini
+2.1 cp parameters.dist.yml (</path/to/appmon>/app/config/) to parameters.yml
 
 2.2 open parameters.ini in your text editor, and change, if necessary the
  database settings:
 
     database_driver   = pdo_mysql
     database_host     = localhost
-    database_port     =
+    database_port     = ~
     database_name     = appmon
     database_user     = root
     database_password =
@@ -61,7 +61,15 @@ First we run a command which does some basic checks (file permissions, php versi
     
 Install dependencies
 
-    php bin/vendors update
+    php composer.phar install
+
+Build bootstrap
+
+    php bin/build_bootstrap
+
+Install assets
+
+    php app/console assets:install ./web
 
 Correct anything if necessary, and then run the following two commands:
     
@@ -72,8 +80,3 @@ That's all, now you fire up your browser and go the configured URL.
 
 Note!
 The application is not secured by any authorization and or ACL. This is your own responsibility.
-
-
-
-
-
