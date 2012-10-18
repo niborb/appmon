@@ -1,0 +1,18 @@
+<h3>Menu</h3>
+<ul class="toggle">
+    <li>&nbsp;</li>
+    {% if is_granted('ROLE_ADMIN') %}
+    <li class="icn_new_article"><a href="{{path('rts_appmon_default_add')}}">{% trans %}New App{% endtrans %}</a></li>
+    <li class="icn_tags"><a href="{{ path('rts_appmon_category_add')}}">{% trans %}New Category {% endtrans %}</a></li>
+    {% endif %}
+    <li class="icn_categories"><a href="{{path('rts_appmon_default_list')}}">{% trans %}App list{% endtrans %}</a></li>
+    <li class="icn_categories"><a href="{{path('rts_appmon_server_list')}}">{% trans %}Server list{% endtrans %}</a></li>
+    <li class="icn_categories"><a href="{{path('rts_appmon_category_list')}}">{% trans %}Category list{% endtrans %}</a></li>
+    <li>&nbsp;</li>
+    {%  if app.user  %}
+        <li class="icn_logout"><a href="{{ path('fos_user_security_logout') }}">{% trans %}Logout{% endtrans %}</a></li>
+    {% endif %}
+    {%  if not app.user  %}
+        <li class="icn_logout"><a href="{{ path('fos_user_security_in') }}">{% trans %}Login{% endtrans %}</a></li>
+    {% endif %}
+</ul>

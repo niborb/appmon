@@ -337,6 +337,9 @@ background: url(../images/icn_security.png) no-repeat center left;
 #sidebar li.icn_jump_back a {
 background: url(../images/icn_jump_back.png) no-repeat center left;
 }
+#sidebar li.icn_logout a {
+    background: url(../images/icn_logout.png) no-repeat center left;
+}
 
 #sidebar p {
 color: #666666;

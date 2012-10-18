@@ -30,7 +30,7 @@
             <th class="app-description">{% trans %}Name{% endtrans %}</th>
             <th>{% trans %}Version{% endtrans %}</th>
             <th class="http-status">{% trans %}Status{% endtrans %}</th>
-            <th colspan="4">&nbsp;</th>
+            <th colspan="{% if is_granted('ROLE_ADMIN') %}4{% else %}2{% endif %}">&nbsp;</th>
         </tr>
         </thead>
 
@@ -68,6 +68,7 @@
             <td class="app-http-status">
                 <span class="http-status-default http-status-{{application.httpStatus}}">{{ application.httpStatus}}</span>
             </td>
+            {% if is_granted('ROLE_ADMIN') %}
             <td>
                 <a onclick="if (!confirm('{% trans%} Are you sure you want to delete this app? {% endtrans %}')) { return false;}"
                    href="{{path('rts_appmon_default_delete', {'id': application.id}) }}">
@@ -75,17 +76,20 @@
                          title="{% trans %}delete{% endtrans %}"/>
                 </a>
             </td>
+            {% endif %}
             <td><a href="javascript:updateSelectedApp({{ application.id }})">
                 <img src="{{ asset('bundles/rtsappmon/images/database_refresh.png')}}"
                      title="{% trans %}update{% endtrans %}"/>
             </a>
             </td>
+            {% if is_granted('ROLE_ADMIN') %}
             <td>
                 <a href="{{path('rts_appmon_default_edit', {'id': application.id}) }}">
                     <img src="{{ asset('bundles/rtsappmon/images/application_form_edit.png')}}"
                          title="{% trans %}edit{% endtrans %}"/>
                 </a>
             </td>
+            {% endif %}
             <td>
                 <a target="_blank" href="{{ application.homeUrl}}">
                     <img src="{{ asset('bundles/rtsappmon/images/link_go.png')}}"

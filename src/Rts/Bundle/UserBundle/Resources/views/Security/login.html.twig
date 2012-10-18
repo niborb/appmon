@@ -1,0 +1,45 @@
+{% extends 'RtsAppMonBundle::layout.html.twig' %}
+{% block secondary_bar%}
+    {{ parent()}}
+    <div id="progressbar"></div>
+{% endblock%}
+{% block sidebar %}
+{% endblock%}
+{% block content %}
+{% block fos_user_content %}
+<article class="module width_half" xmlns="http://www.w3.org/1999/html">
+    <header><h3>Login</h3></header>
+    <div class="module_content">
+{% if error %}
+        <div>{{ error|trans({}, 'FOSUserBundle') }}</div>
+{% endif %}
+        <form action="{{ path("fos_user_security_check") }}" method="post">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+        <table>
+            <tr>
+                <td><label for="username">{{ 'security.login.username'|trans({}, 'FOSUserBundle') }}</label></td>
+                <td><input type="text" id="username" name="_username" value="{{ last_username }}" /></td>
+            </tr>
+            <tr>
+                <td><label for="password">{{ 'security.login.password'|trans({}, 'FOSUserBundle') }}</label></td>
+                <td><input type="password" id="password" name="_password" /></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <input type="checkbox" id="remember_me" name="_remember_me" value="on" />
+                    <label for="remember_me">{{ 'security.login.remember_me'|trans({}, 'FOSUserBundle') }}</label>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan="2"><input type="submit" id="_submit" name="_submit" value="{{ 'security.login.submit'|trans({}, 'FOSUserBundle') }}" /></td>
+            </tr>
+        </table>
+        </form>
+    </div>
+</article>
+{% endblock fos_user_content %}
+{% endblock %}

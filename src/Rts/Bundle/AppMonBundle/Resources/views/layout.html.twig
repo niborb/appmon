@@ -71,30 +71,28 @@
 {% block secondary_bar %}
 {% endblock %}
 </section><!-- end of secondary bar -->
-
+{% block sidebar %}
 <aside id="sidebar" class="column">
+    {%  if app.user  %}
+    <p>
+        <strong>{% trans %}Username{% endtrans %}:</strong> {{ app.user.username }}<br />
+        <strong>{% trans %}Email{% endtrans %}:</strong> {{ app.user.email }}<br />
+    </p>
+    <hr/>
     <form class="quick_search" action="{{path('rts_appmon_default_search')}}" method="get">
         <input type="text" name="search" value="{{app.request.get('search','Quick Search')}}"  onfocus="if(!this._haschanged){this.value=''};this._haschanged=true;">
     </form>
     <hr/>
-    <h3>Menu</h3>
-    <ul class="toggle">
-        <li class="icn_new_article"><a href="{{path('rts_appmon_default_add')}}">{% trans %}New App{% endtrans %}</a></li>
-        <li class="icn_tags"><a href="{{ path('rts_appmon_category_add')}}">{% trans %}New Category {% endtrans %}</a></li>
-        {#<li class="icn_new_article"><a href="{{path('rts_appmon_server_add')}}">New Server</a></li>#}
-        <li class="icn_categories"><a href="{{path('rts_appmon_default_list')}}">{% trans %}App list{% endtrans %}</a></li>
-        <li class="icn_categories"><a href="{{path('rts_appmon_server_list')}}">{% trans %}Server list{% endtrans %}</a></li>
-        <li class="icn_categories"><a href="{{path('rts_appmon_category_list')}}">{% trans %}Category list{% endtrans %}</a></li>
-
-    </ul>
-
-
+    {% endif %}
+    {%  include 'RtsAppMonBundle::menu.html.twig' %}
     <footer>
         <hr/>
         <p><strong>Copyright &copy; 2012 RT-Sofware</strong></p>
         <p>Theme by <a href="http://www.medialoot.com">MediaLoot</a></p>
     </footer>
-</aside><!-- end of sidebar -->
+</aside>
+<!-- end of sidebar -->
+{% endblock %}
 
 <section id="main" class="column">
     {% if app.session.hasFlash('info') %}

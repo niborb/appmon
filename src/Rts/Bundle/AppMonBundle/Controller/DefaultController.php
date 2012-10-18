@@ -10,11 +10,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use JMS\SecurityExtraBundle\Annotation\Secure;
 
 class DefaultController extends Controller
 {
     /**
      * @Route("/app/post/{id}", requirements={"id" = "\d+"}, defaults={"id" = NULL})
+     * @Secure(roles="ROLE_ADMIN")
      * @Method({"POST"})
      * @Template("RtsAppMonBundle:Default:edit.html.twig")
      */
@@ -51,6 +53,7 @@ class DefaultController extends Controller
     /**
      * delete the app record
      * @Route("/app/delete/{id}", requirements={"id" = "\d+"})
+     * @Secure(roles="ROLE_ADMIN")
      * @param \Rts\Bundle\AppMonBundle\Entity\App $app
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -69,6 +72,7 @@ class DefaultController extends Controller
 
     /**
      * @Route("/app/add", defaults={"id" = NULL})
+     * @Secure(roles="ROLE_ADMIN")
      * @Template("RtsAppMonBundle:Default:edit.html.twig")
      * @Method({"GET"})
      * @return array
@@ -80,6 +84,7 @@ class DefaultController extends Controller
 
     /**
      * @Route("/app/edit/{id}", requirements={"id" = "\d+"})
+     * @Secure(roles="ROLE_ADMIN")
      * @Template()
      * @Method({"GET"})
      * @param \Rts\Bundle\AppMonBundle\Entity\App $app
@@ -96,6 +101,7 @@ class DefaultController extends Controller
 
     /**
      * @Route("/app/update_all")
+     * @Secure(roles="ROLE_ADMIN")
      * @Method({"GET"})
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -114,6 +120,7 @@ class DefaultController extends Controller
 
     /**
      * @Route("/app/update/{id}")
+     * @Secure(roles="ROLE_ADMIN")
      * @Method({"GET"})
      * @param \Rts\Bundle\AppMonBundle\Entity\App $app
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
@@ -199,6 +206,7 @@ class DefaultController extends Controller
      * TODO: move the search query to the AppRepository class
      *
      * @Route("/app/search.{_format}", defaults={"_format" = "html"}, requirements={"_format" = "html|xml|rdf"})
+     * @Secure(roles="ROLE_USER")
      * @param $search
      * @return array
      */
@@ -260,6 +268,7 @@ class DefaultController extends Controller
      * Example to return version information in JSON
      *
      * @Route("/appmon/version.{_format}", defaults={"_format" = "json"}, requirements={"_format" = "json"})
+     * @Secure(roles="ROLE_USER")
      * @Template()
      */
     public function versionAction()
@@ -290,6 +299,7 @@ class DefaultController extends Controller
 
     /**
      * @Route("/")
+     * @Secure(roles="ROLE_USER")
      * @Template()
      */
     public function helpAction()
@@ -299,6 +309,7 @@ class DefaultController extends Controller
 
     /**
      * @Route("/app/{id}/list.by.category.{_format}", requirements={"id" = "\d+", "_format" = "html|xml|rdf"}, defaults={"id" = 0, "_format" = "html"})
+     * @Secure(roles="ROLE_USER")
      * @Method({"GET"})
      */
     public function listByCategoryAction(AppCategory $category)
@@ -318,6 +329,7 @@ class DefaultController extends Controller
 
     /**
      * @Route("/app/{id}/list.{_format}", requirements={"id" = "\d+", "_format" = "html|xml|rdf"}, defaults={"id" = 0, "_format" = "html"})
+     * @Secure(roles="ROLE_USER")
      * @Route("/{id}", requirements={"id" = "\d+"}, defaults={"id" = NULL})
      */
     public function listAction(Server $server = NULL)

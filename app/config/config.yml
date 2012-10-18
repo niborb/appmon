@@ -1,10 +1,10 @@
 imports:
     - { resource: parameters.ini }
-#    - { resource: security.yml }
+    - { resource: security.yml }
 
 framework:
     #esi:             ~
-    #translator:      { fallback: %locale% }
+    translator:      { fallback: %locale% }
     secret:          %secret%
     charset:         UTF-8
     router:          { resource: "%kernel.root_dir%/config/routing.yml" }
@@ -55,6 +55,35 @@ swiftmailer:
     username:  %mailer_user%
     password:  %mailer_password%
 
-#jms_security_extra:
-#    secure_controllers:  true
-#    secure_all_services: false
+jms_security_extra:
+    secure_controllers:  true
+    secure_all_services: false
+
+fos_user:
+    db_driver: orm
+    firewall_name: secured_area
+    user_class: Rts\Bundle\UserBundle\Entity\User
+
+fr3d_ldap:
+    client:
+        host:         %ldap_host%
+        port:         %ldap_port%
+        version:      %ldap_version%
+        username:     %ldap_username%
+        password:     %ldap_password%
+
+    user:
+        baseDn: %ldap_baseDn%
+        filter: %ldap_filter%
+        attributes:
+            - { ldap_attr: samaccountname,   user_method: setUsername }
+            - { ldap_attr: mail, user_method: setEmail }
+            - { ldap_attr: memberof, user_method: setMemberOf }
+
+    service:
+        ldap_manager: rts_user.ldap.ldap_manager
+
+rts_user:
+    map_ldap_roles:
+        ROLE_SUPER_ADMIN: [ %ldap_role_map_super_admin% ]
+        ROLE_ADMIN:       [ %ldap_role_map_admin% ]

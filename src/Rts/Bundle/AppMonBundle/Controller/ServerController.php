@@ -9,11 +9,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use JMS\SecurityExtraBundle\Annotation\Secure;
 
 class ServerController extends Controller
 {
     /**
      * @Route("/server/post/{id}", requirements={"id" = "\d+"}, defaults={"id" = NULL})
+     * @Secure(roles="ROLE_ADMIN")
      * @Method({"POST"})
      * @Template("RtsAppMonBundle:Server:edit.html.twig")
      */
@@ -44,6 +46,7 @@ class ServerController extends Controller
     /**
      * delete the server record
      * @Route("/server/delete/{id}", requirements={"id" = "\d+"})
+     * @Secure(roles="ROLE_ADMIN")
      * @param \Rts\Bundle\AppMonBundle\Entity\Server $server
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -60,6 +63,7 @@ class ServerController extends Controller
 
     /**
      * @Route("/server/add", defaults={"id" = NULL})
+     * @Secure(roles="ROLE_ADMIN")
      * @Template("RtsAppMonBundle:Server:edit.html.twig")
      * @Method({"GET"})
      */
@@ -70,6 +74,7 @@ class ServerController extends Controller
 
     /**
      * @Route("/server/edit/{id}", requirements={"id" = "\d+"})
+     * @Secure(roles="ROLE_ADMIN")
      * @Template()
      * @Method({"GET"})
      */
@@ -92,6 +97,7 @@ class ServerController extends Controller
 
     /**
      * @Route("/server/list")
+     * @Secure(roles="ROLE_USER")
      * @Template()
      */
     public function listAction()

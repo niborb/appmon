@@ -10,12 +10,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use JMS\SecurityExtraBundle\Annotation\Secure;
 
 class CategoryController extends Controller
 {
 
     /**
      * @Route("/category/post/{id}", requirements={"id" = "\d+"}, defaults={"id" = NULL})
+     * @Secure(roles="ROLE_ADMIN")
      * @Method({"POST"})
      * @Template("RtsAppMonBundle:Category:edit.html.twig")
      */
@@ -56,6 +58,7 @@ class CategoryController extends Controller
 
     /**
      * @Route("/category/add", defaults={"id" = NULL})
+     * @Secure(roles="ROLE_ADMIN")
      * @Template("RtsAppMonBundle:Category:edit.html.twig")
      * @Method({"GET"})
      * @return array
@@ -67,6 +70,7 @@ class CategoryController extends Controller
 
     /**
      * @Route("/category/edit/{id}", requirements={"id" = "\d+"})
+     * @Secure(roles="ROLE_ADMIN")
      * @Template()
      * @Method({"GET"})
      * @param \Rts\Bundle\AppMonBundle\Entity\AppCategory $category
@@ -88,6 +92,7 @@ class CategoryController extends Controller
     /**
      * delete the app record
      * @Route("/category/delete/{id}", requirements={"id" = "\d+"})
+     * @Secure(roles="ROLE_ADMIN")
      * @param \Rts\Bundle\AppMonBundle\Entity\AppCategory $category
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -106,6 +111,7 @@ class CategoryController extends Controller
 
     /**
      * @Route("/category/list")
+     * @Secure(roles="ROLE_USER")
      * @Template()
      */
     public function listAction()

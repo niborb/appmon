@@ -10,7 +10,7 @@
         <tr>
             <th width="10%">{% trans %}#{% endtrans %}</th>
             <th width="70%">{% trans %}Name{% endtrans %}</th>
-            <th colspan="3">&nbsp;</th>
+            <th colspan="{% if is_granted('ROLE_ADMIN') %}3{% else %}1{% endif %}">&nbsp;</th>
         </tr>
         </thead>
         <tbody>
@@ -19,6 +19,7 @@
         <tr>
             <td>{{ category.id }}</td>
             <td>{{ category.name }}</td>
+            {% if is_granted('ROLE_ADMIN') %}
             <td>
                 {% if category.apps|length == 0 %}
                 <a onclick="if (!confirm('{% trans%} Are you sure you want to delete this category? {% endtrans %}')) { return false;}"
@@ -28,14 +29,13 @@
             </a>
                 {% endif %}
             </td>
-
             <td>
                 <a href="{{path('rts_appmon_category_edit', {'id': category.id}) }}">
                     <img src="{{ asset('bundles/rtsappmon/images/application_form_edit.png')}}"
                          title="{% trans %}edit{% endtrans %}"/>
                 </a>
             </td>
-
+            {% endif %}
             <td>
                 {% if category.apps|length > 0 %}
                 <a href="{{path('rts_appmon_default_listbycategory', {'id': category.id}) }}">

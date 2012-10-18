@@ -10,7 +10,7 @@
             <th>{% trans %}Description{% endtrans %}</th>
             <th>{% trans %}Hostname{% endtrans %}</th>
             <th>{% trans %}IP{% endtrans %}</th>
-            <th colspan="3">&nbsp;</th>
+            <th colspan="{% if is_granted('ROLE_ADMIN') %}3{% else %}1{% endif %}">&nbsp;</th>
         </tr>
         </thead>
 
@@ -22,6 +22,7 @@
             <td>{{ server.description }}</td>
             <td>{{ server.hostname }}</td>
             <td>{{ server.ipAddress }}</td>
+            {% if is_granted('ROLE_ADMIN') %}
             <td>
                 {% if server.apps|length == 0 %}
                 <a onclick="if (!confirm('{% trans%} Are you sure you want to delete this server? {% endtrans %}')) { return false;}"
@@ -31,13 +32,13 @@
                 </a>
                 {% endif %}
             </td>
-
             <td>
                 <a href="{{path('rts_appmon_server_edit', {'id': server.id}) }}">
                     <img src="{{ asset('bundles/rtsappmon/images/application_form_edit.png')}}"
                          title="{% trans %}edit{% endtrans %}"/>
                 </a>
             </td>
+            {% endif %}
             <td>
                 <a href="{{path('rts_appmon_default_list', {'id': server.id}) }}">
                     <img src="{{ asset('bundles/rtsappmon/images/application_view_icons.png')}}"

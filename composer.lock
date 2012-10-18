@@ -1,5 +1,5 @@
 {
-    "hash": "60bd18e01329204064bd1648b7d73b5d",
+    "hash": "5052bd50ceedee31559c6cf250d1f28f",
     "packages": [
         {
             "name": "doctrine/common",
@@ -179,6 +179,122 @@
             "keywords": [
                 "database",
                 "orm"
+            ]
+        },
+        {
+            "name": "fr3d/ldap-bundle",
+            "version": "dev-master",
+            "target-dir": "FR3D/LdapBundle",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Maks3w/FR3DLdapBundle",
+                "reference": "2253c4faeb66c90b050b7cf59bedfa5550f3734b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/Maks3w/FR3DLdapBundle/zipball/2253c4faeb66c90b050b7cf59bedfa5550f3734b",
+                "reference": "2253c4faeb66c90b050b7cf59bedfa5550f3734b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2",
+                "ext-ldap": "*",
+                "symfony/config": "2.0.*",
+                "symfony/dependency-injection": "2.0.*",
+                "symfony/security": "2.0.*",
+                "symfony/security-bundle": "2.0.*"
+            },
+            "require-dev": {
+                "symfony/class-loader": "2.0.*",
+                "symfony/validator": "2.0.*"
+            },
+            "suggest": {
+                "symfony/validator": "Allow pre-validate for existing users before register new ones",
+                "friendsofsymfony/user-bundle": "Integrate authentication and management for DB users, useful for unmanaged LDAP servers"
+            },
+            "time": "1340058589",
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.5.x-dev"
+                }
+            },
+            "installation-source": "source",
+            "autoload": {
+                "psr-0": {
+                    "FR3D\\LdapBundle": ""
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Maks3w"
+                }
+            ],
+            "description": "This package provide users and authentication services based on LDAP directories for Symfony2 framework",
+            "homepage": "https://github.com/Maks3w/FR3DLdapBundle",
+            "keywords": [
+                "Authentication",
+                "ldap"
+            ]
+        },
+        {
+            "name": "friendsofsymfony/user-bundle",
+            "version": "1.2.x-dev",
+            "target-dir": "FOS/UserBundle",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/FriendsOfSymfony/FOSUserBundle",
+                "reference": "50e81ca520a83d49378655dbd40074b44463662a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/FriendsOfSymfony/FOSUserBundle/zipball/50e81ca520a83d49378655dbd40074b44463662a",
+                "reference": "50e81ca520a83d49378655dbd40074b44463662a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2",
+                "symfony/framework-bundle": "2.0.*",
+                "symfony/security-bundle": "2.0.*"
+            },
+            "suggest": {
+                "symfony/doctrine-bundle": "2.0.*",
+                "doctrine/mongodb-odm-bundle": "2.0.*",
+                "doctrine/couchdb-odm-bundle": "*"
+            },
+            "time": "1344340669",
+            "type": "symfony-bundle",
+            "installation-source": "source",
+            "autoload": {
+                "psr-0": {
+                    "FOS\\UserBundle": ""
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christophe Coevoet",
+                    "email": "stof@notk.org"
+                },
+                {
+                    "name": "Thibault Duplessis",
+                    "email": "thibault.duplessis@gmail.com",
+                    "homepage": "http://ornicar.github.com"
+                },
+                {
+                    "name": "FriendsOfSymfony Community",
+                    "homepage": "https://github.com/friendsofsymfony/FOSUserBundle/contributors"
+                }
+            ],
+            "description": "Symfony FOSUserBundle",
+            "homepage": "http://friendsofsymfony.github.com",
+            "keywords": [
+                "User management"
             ]
         },
         {
@@ -727,18 +843,18 @@
             "source": {
                 "type": "git",
                 "url": "git://github.com/fabpot/Twig.git",
-                "reference": "bac6bc7851c51692af1d855065e88b564e047b3b"
+                "reference": "bc64a7f7fa854cb07a13fd1f9e6ba4deeb313882"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/fabpot/Twig/zipball/bac6bc7851c51692af1d855065e88b564e047b3b",
-                "reference": "bac6bc7851c51692af1d855065e88b564e047b3b",
+                "url": "https://github.com/fabpot/Twig/zipball/bc64a7f7fa854cb07a13fd1f9e6ba4deeb313882",
+                "reference": "bc64a7f7fa854cb07a13fd1f9e6ba4deeb313882",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2.4"
             },
-            "time": "1350391198",
+            "time": "1350561702",
             "type": "library",
             "extra": {
                 "branch-alias": {

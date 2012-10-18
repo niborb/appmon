@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="rts_user.ldap.ldap_manager.class">Rts\Bundle\UserBundle\Ldap\LdapManager</parameter>
+    </parameters>
+
+<services>
+    <service id="rts_user.ldap.ldap_manager" class="%rts_user.ldap.ldap_manager.class%">
+        <argument type="service" id="fr3d_ldap.client" />
+        <argument type="service" id="fr3d_ldap.user_manager" />
+        <argument type="service" id="doctrine.orm.entity_manager" />
+        <argument>%fr3d_ldap.ldap_manager.parameters%</argument>
+        <argument>%rts_user.map_ldap_roles%</argument>
+    </service>
+</services>
+
+</container>
