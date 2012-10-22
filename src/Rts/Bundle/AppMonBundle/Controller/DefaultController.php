@@ -101,7 +101,7 @@ class DefaultController extends Controller
 
     /**
      * @Route("/app/update_all")
-     * @Secure(roles="ROLE_ADMIN")
+     * @Secure(roles="ROLE_USER")
      * @Method({"GET"})
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -120,7 +120,7 @@ class DefaultController extends Controller
 
     /**
      * @Route("/app/update/{id}")
-     * @Secure(roles="ROLE_ADMIN")
+     * @Secure(roles="ROLE_USER")
      * @Method({"GET"})
      * @param \Rts\Bundle\AppMonBundle\Entity\App $app
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
