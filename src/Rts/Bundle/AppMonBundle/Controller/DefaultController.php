@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 
 class DefaultController extends Controller
@@ -203,68 +204,6 @@ class DefaultController extends Controller
     }
 
     /**
-     * TODO: move the search query to the AppRepository class
-     *
-     * @Route("/app/search.{_format}", defaults={"_format" = "html"}, requirements={"_format" = "html|xml|rdf"})
-     * @Secure(roles="ROLE_USER")
-     * @param $search
-     * @return array
-     */
-    public function searchAction()
-    {
-        $search = $this->getRequest()->get('search');
-
-        $server = $this->getRequest()->get('server');
-        $category = $this->getRequest()->get('category');
-
-        $em = $this->getDoctrine()->getEntityManager();
-        $qb = $em->createQueryBuilder();
-        $qb->select('a, s, c')
-            ->from('RtsAppMonBundle:App', 'a')
-            ->join('a.server', 's')
-            ->leftJoin('a.category', 'c')
-            ->where(
-            $qb->expr()->like('s.hostname', ':search')
-        )->orWhere(
-            $qb->expr()->like('s.ip_address', ':search')
-        )->orWhere(
-            $qb->expr()->like('a.name', ':search')
-        )->orWhere(
-            $qb->expr()->like('a.meta_data_json', ':search')
-        )->orWhere(
-            $qb->expr()->like('c.name', ':search')
-        )
-            ->orderBy('s.hostname', 'ASC')
-            ->setParameter('search', "%$search%");
-
-        if ($server) {
-            $qb->andWhere('s.id = :server');
-            $qb->setParameter('server', $server);
-        }
-
-        if ($category) {
-            $qb->andWhere('c.id = :category');
-            $qb->setParameter('category', $category);
-        }
-
-
-        $apps = $qb->getQuery()->getResult();
-
-        $this->get('session')->setFlash('info', sprintf(
-            $this->get('translator')->trans('You searched for "%s". %s application(s) found'),
-            $search, count($apps)));
-
-        $format = $this->getRequest()->getRequestFormat();
-        
-        $response = $this->render(
-            'RtsAppMonBundle:Default:list.' . $format . '.twig',
-            array('apps' => $apps)
-        );
-        
-        return $response;
-    }
-
-    /**
      * Example to return version information in JSON
      *
      * @Route("/appmon/version.{_format}", defaults={"_format" = "json"}, requirements={"_format" = "json"})
@@ -308,12 +247,86 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/app/{id}/list.by.category.{_format}", requirements={"id" = "\d+", "_format" = "html|xml|rdf"}, defaults={"id" = 0, "_format" = "html"})
-     * @Secure(roles="ROLE_USER")
-     * @Method({"GET"})
+     * TODO: move the search query to the AppRepository class
+     *
+     * @Route("/app/search.{_format}", defaults={"_format" = "html"}, requirements={"_format" = "html|xml|rdf"})
+     *
+     * @param string $_format [optional] default = html
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function listByCategoryAction(AppCategory $category)
+    public function searchAction($_format = 'html')
     {
+        if ($_format == 'html') {
+            $this->isGranted('ROLE_USER');
+        }
+
+        $search = $this->getRequest()->get('search');
+        $server = $this->getRequest()->get('server');
+        $category = $this->getRequest()->get('category');
+
+        $em = $this->getDoctrine()->getEntityManager();
+        $qb = $em->createQueryBuilder();
+        $qb->select('a, s, c')
+            ->from('RtsAppMonBundle:App', 'a')
+            ->join('a.server', 's')
+            ->leftJoin('a.category', 'c')
+            ->where(
+            $qb->expr()->like('s.hostname', ':search')
+        )->orWhere(
+            $qb->expr()->like('s.ip_address', ':search')
+        )->orWhere(
+            $qb->expr()->like('a.name', ':search')
+        )->orWhere(
+            $qb->expr()->like('a.meta_data_json', ':search')
+        )->orWhere(
+            $qb->expr()->like('c.name', ':search')
+        )
+            ->orderBy('s.hostname', 'ASC')
+            ->setParameter('search', "%$search%");
+
+        if ($server) {
+            $qb->andWhere('s.id = :server');
+            $qb->setParameter('server', $server);
+        }
+
+        if ($category) {
+            $qb->andWhere('c.id = :category');
+            $qb->setParameter('category', $category);
+        }
+
+
+        $apps = $qb->getQuery()->getResult();
+
+        $this->get('session')->setFlash('info', sprintf(
+            $this->get('translator')->trans('You searched for "%s". %s application(s) found'),
+            $search, count($apps)));
+
+        $format = $this->getRequest()->getRequestFormat();
+
+        $response = $this->render(
+            'RtsAppMonBundle:Default:list.' . $format . '.twig',
+            array('apps' => $apps)
+        );
+
+        return $response;
+    }
+
+    /**
+     * @Route("/app/{id}/list.by.category.{_format}", requirements={"id" = "\d+", "_format" = "html|xml|rdf"}, defaults={"id" = 0, "_format" = "html"})
+     * @Method({"GET"})
+     *
+     * @param \Rts\Bundle\AppMonBundle\Entity\AppCategory $category
+     * @param string $_format [optional] default = html
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function listByCategoryAction(AppCategory $category, $_format = 'html')
+    {
+        if ($_format == 'html') {
+            $this->isGranted('ROLE_USER');
+        }
+
         $apps = $this->getDoctrine()->getRepository('RtsAppMonBundle:App')
             ->findBy(array('category' => $category->getId()));
 
@@ -329,11 +342,19 @@ class DefaultController extends Controller
 
     /**
      * @Route("/app/{id}/list.{_format}", requirements={"id" = "\d+", "_format" = "html|xml|rdf"}, defaults={"id" = 0, "_format" = "html"})
-     * @Secure(roles="ROLE_USER")
      * @Route("/{id}", requirements={"id" = "\d+"}, defaults={"id" = NULL})
+     *
+     * @param \Rts\Bundle\AppMonBundle\Entity\Server $server
+     * @param string $_format [optional] default = html
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function listAction(Server $server = NULL)
+    public function listAction(Server $server = NULL, $_format = 'html')
     {
+        if ($_format == 'html') {
+            $this->isGranted('ROLE_USER');
+        }
+
         if ($server instanceof Server) {
             $serverId = $server->getId();
         }
@@ -360,5 +381,21 @@ class DefaultController extends Controller
         
         return $response;
     }
-}
 
+    /**
+     * Checks if passed role is granted, if not throws an
+     * AccessDeniedException
+     *
+     * @param string $role
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @return void
+     */
+    protected function isGranted($role)
+    {
+        $securityContext = $this->get('security.context');
+        if (false === $securityContext->isGranted($role)) {
+            throw new AccessDeniedException();
+        }
+    }
+
+}

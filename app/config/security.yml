@@ -38,5 +38,8 @@ security:
     access_control:
         - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/login_check$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/app/.*/list, roles: [ IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER ], ip: 127.0.0.1 }
+        - { path: ^/app/.*/list.by.category, roles: [ IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER ], ip: 127.0.0.1 }
+        - { path: ^/app/search, roles: [ IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER ], ip: 127.0.0.1 }
         - { path: ^/_internal, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1 }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
