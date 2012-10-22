@@ -8,13 +8,33 @@ use Rts\Bundle\UserBundle\Entity\User;
 use FR3D\LdapBundle\Driver\LdapConnectionInterface;
 use Doctrine\ORM\EntityManager;
 
+/**
+ * Ldap Manager class which will be responsible for
+ * Updating the internal roles based on the configured
+ * LDAP role mapping.
+ */
 class LdapManager extends BaseLdapManager
 {
 
+    /**
+     * @var array
+     */
     protected $mapping;
 
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
     protected $em;
 
+    /**
+     * C'tor
+     *
+     * @param \FR3D\LdapBundle\Driver\LdapConnectionInterface $connection
+     * @param $userManager
+     * @param \Doctrine\ORM\EntityManager $em
+     * @param array $params
+     * @param array $mapping
+     */
     public function __construct(
         LdapConnectionInterface $connection,
         $userManager,
@@ -27,6 +47,14 @@ class LdapManager extends BaseLdapManager
         parent::__construct($connection, $userManager, $params);
     }
 
+    /**
+     * Use the parents hydrate first and after this do the LDAP
+     * roles to internal roles mapping.
+     *
+     * @param \FR3D\LdapBundle\Model\LdapUserInterface $user
+     * @param array $entry
+     * @return \FR3D\LdapBundle\Model\LdapUserInterface
+     */
     protected function hydrate(LdapUserInterface $user, array $entry)
     {
         $ldapManager = parent::hydrate($user, $entry);
@@ -50,7 +78,7 @@ class LdapManager extends BaseLdapManager
                         }
                     }
                 }
-                $objUser->setRoles($roles   );
+                $objUser->setRoles($roles);
                 $this->em->flush();
             }
 
