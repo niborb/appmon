@@ -19,8 +19,13 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('rts_user');
-        $rootNode->children()->variableNode('map_ldap_roles')
-            ->end();
+        $rootNode
+            ->children()
+                ->variableNode('map_ldap_roles')
+                ->defaultValue(array())
+            ->end()
+        ->end();
+
         return $treeBuilder;
     }
 }
