@@ -5,12 +5,13 @@ namespace Rts\Bundle\AppMonBundle\Controller;
 use Rts\Bundle\AppMonBundle\Entity\App;
 use Rts\Bundle\AppMonBundle\Entity\AppCategory;
 use Rts\Bundle\AppMonBundle\Entity\Server;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Rts\Bundle\AppMonBundle\Controller;
+use Rts\Bundle\AppMonBundle\Form\AppType;
+
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use JMS\SecurityExtraBundle\Annotation\Secure;
 
 class DefaultController extends Controller
@@ -27,32 +28,32 @@ class DefaultController extends Controller
             $app = new App();
         }
 
-        $form = $this->createForm(
-            new \Rts\Bundle\AppMonBundle\Form\AppType(), $app
-        );
-
+        $form = $this->createForm(new AppType(), $app);
         $form->bindRequest($this->getRequest());
 
         if ($form->isValid()) {
             // save app to db
-            $em = $this->getDoctrine()->getEntityManager();
-            $em->persist($app);
-            $em->flush();
+            $this->getEntityManager()->persist($app);
+            $this->getEntityManager()->flush();
 
             // get info from app server, and return to list
             $this->updateAction($app);
 
-            $this->get('session')->setFlash('info',
-                $this->get('translator')->trans(sprintf('"%s" has been saved', $app)));
+            $message = sprintf($this->trans('"%s" has been saved'), $app->getName());
+            $this->setFlash('info', $message);
 
             return $this->redirect($this->generateUrl('rts_appmon_default_list'));
         }
 
-        return array('form' => $form->createView(), 'application' => $app);
+        return array(
+            'form'        => $form->createView(),
+            'application' => $app
+        );
     }
 
     /**
-     * delete the app record
+     * Delete the app record which is identified by it's id
+     *
      * @Route("/app/delete/{id}", requirements={"id" = "\d+"})
      * @Secure(roles="ROLE_ADMIN")
      * @param \Rts\Bundle\AppMonBundle\Entity\App $app
@@ -60,19 +61,18 @@ class DefaultController extends Controller
      */
     public function deleteAction(App $app)
     {
-        $em = $this->getDoctrine()->getEntityManager();
-        $em->remove($app);
-        $em->flush();
+        $appName = $app->getName();
+        $this->getEntityManager()->remove($app);
+        $this->getEntityManager()->flush();
 
-        $this->get('session')->setFlash('info',
-            $this->get('translator')->trans(sprintf('"%s" has been deleted', $app)));
-
+        $message = sprintf($this->trans('"%s" has been deleted'), $appName);
+        $this->setFlash('info', $message);
 
         return $this->redirect($this->generateUrl('rts_appmon_default_list'));
     }
 
     /**
-     * @Route("/app/add", defaults={"id" = NULL})
+     * @Route("/app/add")
      * @Secure(roles="ROLE_ADMIN")
      * @Template("RtsAppMonBundle:Default:edit.html.twig")
      * @Method({"GET"})
@@ -94,10 +94,13 @@ class DefaultController extends Controller
     public function editAction(App $app)
     {
         $form = $this->createForm(
-            new \Rts\Bundle\AppMonBundle\Form\AppType(), $app
+            new AppType(), $app
         );
 
-        return array('form' => $form->createView(), 'application' => $app);
+        return array(
+            'form'        => $form->createView(),
+            'application' => $app
+        );
     }
 
     /**
@@ -108,9 +111,7 @@ class DefaultController extends Controller
      */
     public function updateAllAction()
     {
-        $em = $this->getDoctrine()->getEntityManager();
-        $repository = $em->getRepository('RtsAppMonBundle:App');
-        $apps = $repository->findAll();
+        $apps = $this->getRepository('RtsAppMonBundle:App')->findAll();
 
         foreach ($apps as $app) {
             $this->updateAction($app);
@@ -134,7 +135,7 @@ class DefaultController extends Controller
             $this->getLogger()->notice('Could not update App data from server because ' . $e->getMessage());
             $this->getLogger()->notice($e);
 
-            $this->get('session')->setFlash('error', '"' . $app . '" could not be updated because of unknown error');
+            $this->setFlash('error', sprintf($this->trans('"%s" could not be updated because of unknown error'), $app->getName()));
             $this->redirect(
                 $this->generateUrl('rts_appmon_default_list')
             );
@@ -163,19 +164,23 @@ class DefaultController extends Controller
         $errors = $validator->validate($app);
 
         if (count($errors) > 0) {
-            $this->get('session')->setFlash('error', '"' . $app . '" could not be updated. Data is not valid');
-            $this->getLogger()->notice('Could not update App, because data is not valid', $errors);
-            $this->redirect(
-                $this->generateUrl('rts_appmon_default_list')
+            $message = sprintf(
+                $this->trans('"%s" could not be updated. Data is not valid'),
+                $app->getName());
+            $this->setFlash('error', $message);
+
+            $this->getLogger()->notice(
+                'Could not update App, because data is not valid',
+                $errors
             );
+            $this->redirect($this->generateUrl('rts_appmon_default_list'));
         }
 
-        $em = $this->getDoctrine()->getEntityManager();
-        $em->persist($app);
+        $this->getEntityManager()->persist($app);
         if (isset($server)) {
-            $em->persist($server);
+            $this->getEntityManager()->persist($server);
         }
-        $em->flush();
+        $this->getEntityManager()->flush();
 
         // if called with ajax, return json response
         if ($this->getRequest()->isXmlHttpRequest()) {
@@ -189,18 +194,10 @@ class DefaultController extends Controller
             $response->headers->set('Content-type', 'text/json');
             return $response;
         }
-
-        $this->get('session')->setFlash('info', '"' . $app . '" has been updated');
+        $message = sprintf($this->trans('"%s" has been updated'), $app);
+        $this->setFlash('info', $message);
 
         return $this->redirect($this->generateUrl('rts_appmon_default_list'));
-    }
-
-    /**
-     * @return object|\Symfony\Component\HttpKernel\Log\LoggerInterface
-     */
-    public function getLogger()
-    {
-        return $this->get('logger');
     }
 
     /**
@@ -257,55 +254,23 @@ class DefaultController extends Controller
      */
     public function searchAction($_format = 'html')
     {
-        if ($_format == 'html') {
-            $this->isGranted('ROLE_USER');
-        }
+        $this->isGranted('ROLE_USER');
 
-        $search = $this->getRequest()->get('search');
-        $server = $this->getRequest()->get('server');
-        $category = $this->getRequest()->get('category');
+        $serverId   = $this->getRequest()->get('server');
+        $categoryId = $this->getRequest()->get('category');
+        $search     = $this->getRequest()->get('search');
 
-        $em = $this->getDoctrine()->getEntityManager();
-        $qb = $em->createQueryBuilder();
-        $qb->select('a, s, c')
-            ->from('RtsAppMonBundle:App', 'a')
-            ->join('a.server', 's')
-            ->leftJoin('a.category', 'c')
-            ->where(
-            $qb->expr()->like('s.hostname', ':search')
-        )->orWhere(
-            $qb->expr()->like('s.ip_address', ':search')
-        )->orWhere(
-            $qb->expr()->like('a.name', ':search')
-        )->orWhere(
-            $qb->expr()->like('a.meta_data_json', ':search')
-        )->orWhere(
-            $qb->expr()->like('c.name', ':search')
-        )
-            ->orderBy('s.hostname', 'ASC')
-            ->setParameter('search', "%$search%");
+        $apps = $this->getRepository('RtsAppMonBundle:App')
+            ->getBySearchArguments(
+                $serverId,
+                $categoryId,
+                $search)
+        ;
 
-        if ($server) {
-            $qb->andWhere('s.id = :server');
-            $qb->setParameter('server', $server);
-        }
-
-        if ($category) {
-            $qb->andWhere('c.id = :category');
-            $qb->setParameter('category', $category);
-        }
-
-
-        $apps = $qb->getQuery()->getResult();
-
-        $this->get('session')->setFlash('info', sprintf(
-            $this->get('translator')->trans('You searched for "%s". %s application(s) found'),
-            $search, count($apps)));
-
-        $format = $this->getRequest()->getRequestFormat();
+        $this->setFlash('info', sprintf($this->trans('You searched for "%s". %s application(s) found'), $search, count($apps)));
 
         $response = $this->render(
-            'RtsAppMonBundle:Default:list.' . $format . '.twig',
+            'RtsAppMonBundle:Default:list.' . $_format . '.twig',
             array('apps' => $apps)
         );
 
@@ -323,17 +288,12 @@ class DefaultController extends Controller
      */
     public function listByCategoryAction(AppCategory $category, $_format = 'html')
     {
-        if ($_format == 'html') {
-            $this->isGranted('ROLE_USER');
-        }
+        $this->isGranted('ROLE_USER');
 
-        $apps = $this->getDoctrine()->getRepository('RtsAppMonBundle:App')
-            ->findBy(array('category' => $category->getId()));
+        $apps = $this->getRepository('RtsAppMonBundle:App')->getByCategoryId($category);
 
-
-        $format = $this->getRequest()->getRequestFormat();
         $response = $this->render(
-            'RtsAppMonBundle:Default:list.' . $format . '.twig',
+            'RtsAppMonBundle:Default:list.' . $_format . '.twig',
             array('apps' => $apps)
         );
 
@@ -343,59 +303,20 @@ class DefaultController extends Controller
     /**
      * @Route("/app/{id}/list.{_format}", requirements={"id" = "\d+", "_format" = "html|xml|rdf"}, defaults={"id" = 0, "_format" = "html"})
      * @Route("/{id}", requirements={"id" = "\d+"}, defaults={"id" = NULL})
+     * @Template()
      *
      * @param \Rts\Bundle\AppMonBundle\Entity\Server $server
      * @param string $_format [optional] default = html
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return array
      */
-    public function listAction(Server $server = NULL, $_format = 'html')
+    public function listAction(Server $server = NULL)
     {
-        if ($_format == 'html') {
-            $this->isGranted('ROLE_USER');
-        }
+        $this->isGranted('ROLE_USER');
 
-        if ($server instanceof Server) {
-            $serverId = $server->getId();
-        }
+        $apps = $this->getRepository('RtsAppMonBundle:App')->getByServerId($server);
 
-        $em = $this->getDoctrine()->getEntityManager();
-        $qb = $em->createQueryBuilder()
-            ->select('a, s')
-            ->from('RtsAppMonBundle:App', 'a')
-            ->join('a.server', 's')
-            ->orderBy('s.hostname', 'ASC');
-
-        if (isset($serverId)) {
-            $qb->where('s.id = :serverId')
-                ->setParameter('serverId', $serverId);
-        }
-
-        $apps = $qb->getQuery()->getResult();
-
-        $format = $this->getRequest()->getRequestFormat();
-        $response = $this->render(
-        	'RtsAppMonBundle:Default:list.' . $format . '.twig',
-        	array('apps' => $apps)
-        );
-        
-        return $response;
-    }
-
-    /**
-     * Checks if passed role is granted, if not throws an
-     * AccessDeniedException
-     *
-     * @param string $role
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     * @return void
-     */
-    protected function isGranted($role)
-    {
-        $securityContext = $this->get('security.context');
-        if (false === $securityContext->isGranted($role)) {
-            throw new AccessDeniedException();
-        }
+        return array('apps' => $apps);
     }
 
 }

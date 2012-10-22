@@ -4,7 +4,8 @@ namespace Rts\Bundle\AppMonBundle\Controller;
 
 use Rts\Bundle\AppMonBundle\Entity\App;
 use Rts\Bundle\AppMonBundle\Entity\Server;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Rts\Bundle\AppMonBundle\Controller;
+
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -13,6 +14,7 @@ use JMS\SecurityExtraBundle\Annotation\Secure;
 
 class ServerController extends Controller
 {
+
     /**
      * @Route("/server/post/{id}", requirements={"id" = "\d+"}, defaults={"id" = NULL})
      * @Secure(roles="ROLE_ADMIN")
@@ -33,14 +35,19 @@ class ServerController extends Controller
 
         if ($form->isValid()) {
             // save app to db
-            $em = $this->getDoctrine()->getEntityManager();
-            $em->persist($server);
-            $em->flush();
-            $this->get('session')->setFlash('info', '"' . $server . '" has been updated');
+            $this->getEntityManager()->persist($server);
+            $this->getEntityManager()->flush();
+
+            $message = sprintf($this->trans('"%s" has been updated'), $server);
+            $this->setFlash('info', $message);
+
             return $this->redirect($this->generateUrl('rts_appmon_server_list'));
         }
 
-        return array('form' => $form->createView(), 'server' => $server);
+        return array(
+            'form'   => $form->createView(),
+            'server' => $server
+        );
     }
 
     /**
@@ -52,11 +59,11 @@ class ServerController extends Controller
      */
     public function deleteAction(Server $server)
     {
-        $em = $this->getDoctrine()->getEntityManager();
-        $em->remove($server);
-        $em->flush();
+        $this->getEntityManager()->remove($server);
+        $this->getEntityManager()->flush();
 
-        $this->get('session')->setFlash('info', '"' . $server . '" has been deleted');
+        $message = sprintf($this->trans('"%s" has been deleted'), $server);
+        $this->setFlash('info', $message);
 
         return $this->redirect($this->generateUrl('rts_appmon_server_list'));
     }
@@ -84,15 +91,10 @@ class ServerController extends Controller
             new \Rts\Bundle\AppMonBundle\Form\ServerType(), $server
         );
 
-        return array('form' => $form->createView(), 'server' => $server);
-    }
-
-    /**
-     * @return object|\Symfony\Component\HttpKernel\Log\LoggerInterface
-     */
-    public function getLogger()
-    {
-        return $this->get('logger');
+        return array(
+            'form'   => $form->createView(),
+            'server' => $server
+        );
     }
 
     /**
@@ -102,9 +104,11 @@ class ServerController extends Controller
      */
     public function listAction()
     {
-        $em = $this->getDoctrine()->getEntityManager();
+        $servers = $this->getRepository('RtsAppMonBundle:Server')->findAll();
 
-        $servers = $em->getRepository('RtsAppMonBundle:Server')->findAll();
-        return array('servers' => $servers);
+        return array(
+            'servers' => $servers
+        );
     }
+
 }

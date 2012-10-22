@@ -4,8 +4,9 @@ namespace Rts\Bundle\AppMonBundle\Controller;
 
 use Rts\Bundle\AppMonBundle\Entity\App;
 use Rts\Bundle\AppMonBundle\Entity\AppCategory;
+use Rts\Bundle\AppMonBundle\Form\AppCategoryType;
+use Rts\Bundle\AppMonBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -28,22 +29,20 @@ class CategoryController extends Controller
         }
 
         $form = $this->createForm(
-            new \Rts\Bundle\AppMonBundle\Form\AppCategoryType(),
+            new AppCategoryType(),
             $category
         );
 
         $form->bindRequest($this->getRequest());
-
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getEntityManager();
-            $em->persist($category);
-            $em->flush();
+            $this->getEntityManager()->persist($category);
+            $this->getEntityManager()->flush();
 
-            $this->get('session')->setFlash('info',
-                $this->get('translator')->trans(sprintf("%s has been saved",
-                    $category)
-                )
+            $message = sprintf(
+                $this->trans('%s has been saved'),
+                $category->getName()
             );
+            $this->setFlash('info', $message);
 
             return $this->redirect(
                 $this->generateUrl('rts_appmon_category_list')
@@ -57,7 +56,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * @Route("/category/add", defaults={"id" = NULL})
+     * @Route("/category/add")
      * @Secure(roles="ROLE_ADMIN")
      * @Template("RtsAppMonBundle:Category:edit.html.twig")
      * @Method({"GET"})
@@ -79,18 +78,17 @@ class CategoryController extends Controller
     public function editAction(AppCategory $category)
     {
         $form = $this->createForm(
-            new \Rts\Bundle\AppMonBundle\Form\AppCategoryType(),
+            new AppCategoryType(),
             $category
         );
 
         return array(
-            'form' => $form->createView(),
+            'form'     => $form->createView(),
             'category' => $category
         );
     }
 
     /**
-     * delete the app record
      * @Route("/category/delete/{id}", requirements={"id" = "\d+"})
      * @Secure(roles="ROLE_ADMIN")
      * @param \Rts\Bundle\AppMonBundle\Entity\AppCategory $category
@@ -98,13 +96,16 @@ class CategoryController extends Controller
      */
     public function deleteAction(AppCategory $category)
     {
-        $em = $this->getDoctrine()->getEntityManager();
-        $em->remove($category);
-        $em->flush();
+        $categoryName = $category->getName();
 
-        $this->get('session')->setFlash('info',
-            $this->get('translator')->trans(sprintf('"%s" has been deleted', $app)));
+        $this->getEntityManager()->remove($category);
+        $this->getEntityManager()->flush();
 
+        $message = sprintf(
+            $this->trans('"%s" has been deleted'),
+            $categoryName
+        );
+        $this->setFlash('info', $message);
 
         return $this->redirect($this->generateUrl('rts_appmon_category_list'));
     }
@@ -116,11 +117,12 @@ class CategoryController extends Controller
      */
     public function listAction()
     {
-        $em = $this->getDoctrine()->getEntityManager();
+        $categories = $this->getRepository('RtsAppMonBundle:AppCategory')
+            ->findAll();
 
-        $categories = $em->getRepository('RtsAppMonBundle:AppCategory')->findAll();
-        return array('categories' => $categories);
+        return array(
+            'categories' => $categories
+        );
     }
 
 }
-
