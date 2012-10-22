@@ -76,7 +76,23 @@ Correct anything if necessary, and then run the following two commands:
     php app/console doctrine:database:create
     php app/console doctrine:schema:create
 
+Create an admin user
+
+    php app/console fos:user:create
+
+Promote the newly created admin user
+
+    php app/console fos:user:promote
+
+type role: ROLE_SUPER_ADMIN
+
+Activate newly created user
+
+    php app/console fos:user:activate
+
+Configure LDAP (Active Directory) settings
+
+edit the parameters.ini file.
+
 That's all, now you fire up your browser and go the configured URL.
 
-Note!
-The application is not secured by any authorization and or ACL. This is your own responsibility.
