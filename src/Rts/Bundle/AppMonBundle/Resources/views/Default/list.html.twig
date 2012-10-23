@@ -38,8 +38,16 @@
 
         {% for application in apps %}
         <tr class="app-row" data-id="{{application.id}}">
-            <td><a class="app-link" data-id="{{application.id}}"
-                   href="{{path('rts_appmon_server_edit', {'id':application.server.id})}}">{{ application.server }}</a>
+            <td>
+                {% if is_granted('ROLE_ADMIN') %}
+                    {% set routeName='rts_appmon_server_edit' %}
+                    {% set title='Edit server' %}
+                {% else %}
+                    {% set routeName='rts_appmon_default_list' %}
+                    {% set title='List all applications deployed on this server' %}
+                {% endif %}
+                <a class="app-link" data-id="{{application.id}}" title="{{ title|trans() }}"
+                   href="{{path(routeName, {'id':application.server.id})}}">{{ application.server }}</a>
             </td>
             <td>{{ application.category}}</td>
             <td><span class="app-name">{{ application.name }}</span>
@@ -48,7 +56,7 @@
                        style="cursor:context-menu;display: {% if (application.metaData|length > 0) or (application.metaLocalDataArray()|length > 0)%} inline; {%else%} none; {%endif%}"
                        onclick="$('#details-{{application.id}}').toggle();"
                        >
-                        {%trans%}(details){% endtrans%}
+                        {% trans %}(details){% endtrans %}
                     </a>
                 </span>
                 <div class="app-details" id="details-{{application.id}}" style="display: none;">
