@@ -24,22 +24,21 @@ security:
 
         secured_area:
             pattern: ^/
-            fr3d_ldap:  ~
+            fr3d_ldap: ~
             form_login:
                 csrf_provider: form.csrf_provider
                 remember_me:   true
             logout:    true
             anonymous: true
-            provider: chain_provider
+            provider:  chain_provider
             remember_me:
                 lifetime: %login_lifetime%
                 key:      %secret%
 
     access_control:
-        - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/login$, roles: [ IS_AUTHENTICATED_ANONYMOUSLY ] }
         - { path: ^/login_check$, roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/app/.*/list, roles: [ IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER ], ip: 127.0.0.1 }
-        - { path: ^/app/.*/list.by.category, roles: [ IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER ], ip: 127.0.0.1 }
-        - { path: ^/app/search, roles: [ IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER ], ip: 127.0.0.1 }
-        - { path: ^/_internal, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1 }
-        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/app/.*/list, roles: [ IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER ] }
+        - { path: ^/app/search, roles: [ IS_AUTHENTICATED_ANONYMOUSLY, ROLE_USER ] }
+        - { path: ^/_internal, roles: [ IS_AUTHENTICATED_ANONYMOUSLY ] }
+        - { path: ^/, roles: [ IS_AUTHENTICATED_FULLY ] }

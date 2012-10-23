@@ -81,9 +81,10 @@ fr3d_ldap:
             - { ldap_attr: memberof, user_method: setMemberOf }
 
     service:
-        ldap_manager: rts_user.ldap.ldap_manager
+        ldap_manager: rts_user.ldap_manager
 
 rts_user:
     map_ldap_roles:
         ROLE_SUPER_ADMIN: [ %ldap_role_map_super_admin% ]
         ROLE_ADMIN:       [ %ldap_role_map_admin% ]
+    ip_whitelist: %ip_whitelist%

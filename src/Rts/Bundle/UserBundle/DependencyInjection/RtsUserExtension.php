@@ -9,11 +9,11 @@ use Symfony\Component\DependencyInjection\Loader;
 
 /**
  * This is the class that loads and manages your bundle configuration
- *
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
  */
 class RtsUserExtension extends Extension
 {
+
     /**
      * {@inheritDoc}
      */
@@ -23,10 +23,14 @@ class RtsUserExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         foreach ($config as $key => $value) {
+            if ($key == 'ip_whitelist' && !in_array('127.0.0.1', $value)) {
+                $value[] = '127.0.0.1';
+            }
             $container->setParameter($this->getAlias().'.'.$key, $value);
         }
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
     }
+
 }

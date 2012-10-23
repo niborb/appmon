@@ -22,9 +22,12 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->variableNode('map_ldap_roles')
-                ->defaultValue(array())
-            ->end()
-        ->end();
+                    ->defaultValue(array())
+                    ->end()
+                ->variableNode('ip_whitelist')
+                    ->defaultValue(array())
+                    ->end()
+            ->end();
 
         return $treeBuilder;
     }
