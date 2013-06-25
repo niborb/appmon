@@ -340,7 +340,15 @@ class App
     public function getDataFromServer($url)
     {
         if (!empty($this->api_key)) {
-            $url .= '?' . http_build_query(array('api_key' => $this->getApiKey()));
+            $urlParts = parse_url($url);
+
+            if (isset($urlParts['query'])) {
+                $urlParts['query'] .= '&api_key=' . $this->getApiKey();
+            } else {
+                $urlParts['query'] = '?api_key=' . $this->getApiKey();
+            }
+
+            $url = $this->http_build_url($urlParts);
         }
 
         $ch = curl_init($url);
@@ -541,6 +549,43 @@ class App
     public function getApiKey()
     {
         return $this->api_key;
+    }
+
+    /**
+     * @see http://www.php.net/manual/en/function.http-build-url.php
+     * @param array $data
+     * @return string
+     */
+    protected function http_build_url(array $data)
+    {
+        $userString = '';
+        if (!empty($data['user'])) {
+            $userString = $data['user'];
+            if (!empty($data['pass'])) {
+                $userString .= ':' . $data['pass'];
+            }
+            $userString .= '@';
+        }
+
+        $hostString = $data['host'];
+        if (!empty($data['port'])) {
+            $hostString .= ':' . $data['port'];
+        }
+
+        $queryString = '';
+        if (!empty($data['query'])) {
+            $queryString .= '?' . $data['query'];
+        }
+
+        return sprintf(
+            '%s://%s%s%s%s%s',
+            $data['scheme'],
+            $userString,
+            $hostString,
+            $data['path'],
+            $queryString,
+            (isset($data['fragment']) ? '#' . $data['fragment'] : '')
+        );
     }
 
 }
