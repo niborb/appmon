@@ -345,7 +345,7 @@ class App
             if (isset($urlParts['query'])) {
                 $urlParts['query'] .= '&api_key=' . $this->getApiKey();
             } else {
-                $urlParts['query'] = '?api_key=' . $this->getApiKey();
+                $urlParts['query'] = 'api_key=' . $this->getApiKey();
             }
 
             $url = $this->http_build_url($urlParts);
